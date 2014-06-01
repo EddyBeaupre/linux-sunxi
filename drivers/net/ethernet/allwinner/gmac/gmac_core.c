@@ -50,31 +50,6 @@
 #include "gmac_desc.h"
 #include "gmac_ethtool.h"
 
-#undef GMAC_DEBUG
-#ifdef GMAC_DEBUG
-#define GMAC_DBG(fmt, args...) ((void)(netif_msg_probe(priv) && pr_debug(fmt, ## args)))
-#define GMAC_INF(fmt, args...) ((void)(netif_msg_probe(priv) && pr_info(fmt, ## args)))
-#else
-#define GMAC_DBG(fmt, args...) do { } while (0)
-#define GMAC_INF(fmt, args...) do { } while (0)
-#endif
-
-#undef RX_DEBUG
-/*#define RX_DEBUG*/
-#ifdef RX_DEBUG
-#define RX_DBG(fmt, args...)  pr_info(fmt, ## args)
-#else
-#define RX_DBG(fmt, args...)  do { } while (0)
-#endif
-
-#undef XMIT_DEBUG
-/*#define XMIT_DEBUG*/
-#ifdef XMIT_DEBUG
-#define TX_DBG(fmt, args...)  pr_info(fmt, ## args)
-#else
-#define TX_DBG(fmt, args...)  do { } while (0)
-#endif
-
 #define GMAC_ALIGN(x)	L1_CACHE_ALIGN(x)
 #define JUMBO_LEN	9000
 
@@ -147,17 +122,17 @@ static int gmac_init_fs(struct net_device *dev);
 static void gmac_exit_fs(void);
 #endif
 
-#if defined(XMIT_DEBUG) || defined(RX_DEBUG)
+#if defined(GMAC_TX_DEBUG) || defined(GMAC_RX_DEBUG)
 static void print_pkt(unsigned char *buf, int len)
 {
 	int j;
-	pr_debug("len = %d byte, buf addr: 0x%p", len, buf);
+	GMAC_DEBUG("len = %d byte, buf addr: 0x%p", len, buf);
 	for (j = 0; j < len; j++) {
 		if ((j % 16) == 0)
-			pr_debug("\n %03x:", j);
-		pr_debug(" %02x", buf[j]);
+			GMAC_DEBUG("\n %03x:", j);
+		GMAC_DEBUG(" %02x", buf[j]);
 	}
-	pr_debug("\n");
+	GMAC_DEBUG("\n");
 }
 #endif
 
@@ -236,7 +211,7 @@ static void gmac_adjust_link(struct net_device *ndev)
 	if (phydev == NULL)
 		return;
 
-	GMAC_DBG( "gmac_adjust_link: called.  address %d link %d\n",
+	GMAC_CORE_DEBUG( "gmac_adjust_link: called.  address %d link %d\n",
 	    phydev->addr, phydev->link);
 
 	spin_lock_irqsave(&priv->lock, flags);
@@ -274,7 +249,7 @@ static void gmac_adjust_link(struct net_device *ndev)
 				break;
 			default:
 				if (netif_msg_link(priv))
-					pr_warning("%s: Speed (%d) is not 10"
+					GMAC_WARN("%s: Speed (%d) is not 10"
 				       " or 100!\n", ndev->name, phydev->speed);
 				break;
 			}
@@ -300,7 +275,7 @@ static void gmac_adjust_link(struct net_device *ndev)
 
 	spin_unlock_irqrestore(&priv->lock, flags);
 
-	GMAC_DBG( "gmac_adjust_link: exiting\n");
+	GMAC_CORE_DEBUG( "gmac_adjust_link: exiting\n");
 }
 
 /**
@@ -327,12 +302,12 @@ static int gmac_init_phy(struct net_device *ndev)
 	snprintf(bus_id, MII_BUS_ID_SIZE, "sunxi_gmac-%x", priv->plat->bus_id);
 	snprintf(phy_id, MII_BUS_ID_SIZE + 3, PHY_ID_FMT, bus_id,
 		 priv->plat->phy_addr);
-	pr_debug("gmac_init_phy:  trying to attach to %s\n", phy_id);
+	GMAC_DEBUG("gmac_init_phy:  trying to attach to %s\n", phy_id);
 
 	phydev = phy_connect(ndev, phy_id, &gmac_adjust_link, 0, phy_interface);
 
 	if (IS_ERR(phydev)) {
-		pr_err("%s: Could not attach to PHY\n", ndev->name);
+		GMAC_ERR("%s: Could not attach to PHY\n", ndev->name);
 		return PTR_ERR(phydev);
 	}
 
@@ -353,7 +328,7 @@ static int gmac_init_phy(struct net_device *ndev)
 		phy_disconnect(phydev);
 		return -ENODEV;
 	}
-	pr_debug("gmac_init_phy:  %s: attached to PHY (UID 0x%x)"
+	GMAC_DEBUG("gmac_init_phy:  %s: attached to PHY (UID 0x%x)"
 		 " Link = %d\n", ndev->name, phydev->phy_id, phydev->link);
 
 	return 0;
@@ -374,12 +349,11 @@ static void display_ring(dma_desc_t *p, int size)
 	};
 	int i;
 	for (i = 0; i < size; i++) {
-		struct tmp_s *x = (struct tmp_s *)(p + i);
-		pr_info("\t%d [0x%x]: DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
+		GMAC_INFO("\t%d [0x%x]: DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
 		       i, (unsigned int)virt_to_phys(&p[i]),
-		       (unsigned int)(x->a), (unsigned int)((x->a) >> 32),
-		       x->b, x->c);
-		pr_info("\n");
+		       (unsigned int)((struct tmp_s *)(p + i)->a), (unsigned int)(((struct tmp_s *)(p + i)->a) >> 32),
+		       (struct tmp_s *)(p + i)->b, (struct tmp_s *)(p + i)->c);
+		GMAC_INFO("\n");
 	}
 }
 
@@ -432,7 +406,7 @@ static void init_dma_desc_rings(struct net_device *ndev)
 		dis_ic = 1;
 #endif
 
-	GMAC_INF( "gmac: txsize %d, rxsize %d, bfsize %d\n",
+	GMAC_CORE_INFO( "gmac: txsize %d, rxsize %d, bfsize %d\n",
 	    txsize, rxsize, bfsize);
 
 	priv->rx_skbuff_dma = kmalloc(rxsize * sizeof(dma_addr_t), GFP_KERNEL);
@@ -452,17 +426,17 @@ static void init_dma_desc_rings(struct net_device *ndev)
 						  GFP_KERNEL);
 
 	if ((priv->dma_rx == NULL) || (priv->dma_tx == NULL)) {
-		pr_err("%s:ERROR allocating the DMA Tx/Rx desc\n", __func__);
+		GMAC_ERR("%s:ERROR allocating the DMA Tx/Rx desc\n", __func__);
 		return;
 	}
 
-	GMAC_INF( "gmac (%s) DMA desc: virt addr (Rx %p, "
+	GMAC_CORE_INFO( "gmac (%s) DMA desc: virt addr (Rx %p, "
 	    "Tx %p)\n\tDMA phy addr (Rx 0x%08x, Tx 0x%08x)\n",
 	    ndev->name, priv->dma_rx, priv->dma_tx,
 	    (unsigned int)priv->dma_rx_phy, (unsigned int)priv->dma_tx_phy);
 
 	/* RX INITIALIZATION */
-	GMAC_INF( "gmac: SKB addresses:\n"
+	GMAC_CORE_INFO( "gmac: SKB addresses:\n"
 			 "skb\t\tskb data\tdma data\n");
 
 	for (i = 0; i < rxsize; i++) {
@@ -471,7 +445,7 @@ static void init_dma_desc_rings(struct net_device *ndev)
 		skb = __netdev_alloc_skb(ndev, bfsize + NET_IP_ALIGN,
 					 GFP_KERNEL);
 		if (unlikely(skb == NULL)) {
-			pr_err("%s: Rx init fails; skb is NULL\n", __func__);
+			GMAC_ERR("%s: Rx init fails; skb is NULL\n", __func__);
 			break;
 		}
 		skb_reserve(skb, NET_IP_ALIGN);
@@ -483,7 +457,7 @@ static void init_dma_desc_rings(struct net_device *ndev)
 
 		gmac_init_desc3(des3_as_data_buf, p);
 
-		GMAC_INF( "[%p]\t[%p]\t[%x]\n", priv->rx_skbuff[i],
+		GMAC_CORE_INFO( "[%p]\t[%p]\t[%x]\n", priv->rx_skbuff[i],
 			priv->rx_skbuff[i]->data, priv->rx_skbuff_dma[i]);
 	}
 	priv->cur_rx = 0;
@@ -510,9 +484,9 @@ static void init_dma_desc_rings(struct net_device *ndev)
 	desc_init_tx(priv->dma_tx, txsize);
 
 	if (netif_msg_hw(priv)) {
-		pr_debug("RX descriptor ring:\n");
+		GMAC_DEBUG("RX descriptor ring:\n");
 		display_ring(priv->dma_rx, rxsize);
-		pr_debug("TX descriptor ring:\n");
+		GMAC_DEBUG("TX descriptor ring:\n");
 		display_ring(priv->dma_tx, txsize);
 	}
 }
@@ -625,7 +599,7 @@ static void gmac_tx(struct gmac_priv *priv)
 			} else
 				priv->ndev->stats.tx_errors++;
 		}
-		TX_DBG("%s: curr %d, dirty %d\n", __func__,
+		GMAC_TX_INFO("%s: curr %d, dirty %d\n", __func__,
 			priv->cur_tx, priv->dirty_tx);
 
 		if (likely(p->desc2))
@@ -659,7 +633,7 @@ static void gmac_tx(struct gmac_priv *priv)
 		netif_tx_lock(priv->ndev);
 		if (netif_queue_stopped(priv->ndev) &&
 		     gmac_tx_avail(priv) > GMAC_TX_THRESH(priv)) {
-			TX_DBG("%s: restart transmit\n", __func__);
+			GMAC_TX_INFO("%s: restart transmit\n", __func__);
 			netif_wake_queue(priv->ndev);
 		}
 		netif_tx_unlock(priv->ndev);
@@ -786,7 +760,7 @@ static void gmac_check_ether_addr(struct gmac_priv *priv)
 		if  (!is_valid_ether_addr(priv->ndev->dev_addr))
 			random_ether_addr(priv->ndev->dev_addr);
 	}
-	pr_warn( "%s: device MAC address %pM\n", priv->ndev->name,
+	GMAC_WARN( "%s: device MAC address %pM\n", priv->ndev->name,
 						   priv->ndev->dev_addr);
 }
 
@@ -810,14 +784,14 @@ static int gmac_open(struct net_device *ndev)
 	/* MDIO bus Registration */
 	ret = gmac_mdio_register(ndev);
 	if (ret < 0) {
-		pr_debug("%s: MDIO bus (id: %d) registration failed",
+		GMAC_DEBUG("%s: MDIO bus (id: %d) registration failed",
 			 __func__, priv->plat->bus_id);
 		goto out_err;
 	}
 
 	ret = gmac_init_phy(ndev);
 	if (unlikely(ret)) {
-		pr_err("%s: Cannot attach to PHY (error: %d)\n", __func__, ret);
+		GMAC_ERR("%s: Cannot attach to PHY (error: %d)\n", __func__, ret);
 		goto out_err;
 	}
 
@@ -831,7 +805,7 @@ static int gmac_open(struct net_device *ndev)
 	ret = gdma_init(priv->ioaddr, priv->plat->pbl,
 				  priv->dma_tx_phy, priv->dma_rx_phy);
 	if (ret < 0) {
-		pr_err("%s: DMA initialization failed\n", __func__);
+		GMAC_ERR("%s: DMA initialization failed\n", __func__);
 		goto open_error;
 	}
 
@@ -845,7 +819,7 @@ static int gmac_open(struct net_device *ndev)
 	ret = request_irq(ndev->irq, gmac_interrupt,
 			 IRQF_SHARED, ndev->name, ndev);
 	if (unlikely(ret < 0)) {
-		pr_err("%s: ERROR: allocating the IRQ %d (error: %d)\n",
+		GMAC_ERR("%s: ERROR: allocating the IRQ %d (error: %d)\n",
 		       __func__, ndev->irq, ret);
 		goto open_error;
 	}
@@ -863,10 +837,10 @@ static int gmac_open(struct net_device *ndev)
 #ifdef CONFIG_GMAC_DEBUG_FS
 	ret = gmac_init_fs(ndev);
 	if (ret < 0)
-		pr_warning("%s: failed debugFS registration\n", __func__);
+		GMAC_WARN("%s: failed debugFS registration\n", __func__);
 #endif
 	/* Start the ball rolling... */
-	GMAC_DBG( "%s: DMA RX/TX processes started...\n", ndev->name);
+	GMAC_CORE_DEBUG( "%s: DMA RX/TX processes started...\n", ndev->name);
 	dma_start_tx(priv->ioaddr);
 	dma_start_rx(priv->ioaddr);
 
@@ -967,7 +941,7 @@ static netdev_tx_t gmac_xmit(struct sk_buff *skb, struct net_device *dev)
 		if (!netif_queue_stopped(dev)) {
 			netif_stop_queue(dev);
 			/* This is a hard error, log it. */
-			pr_err("%s: BUG! Tx Ring full when queue awake\n",
+			GMAC_ERR("%s: BUG! Tx Ring full when queue awake\n",
 				__func__);
 		}
 		return NETDEV_TX_BUSY;
@@ -977,9 +951,9 @@ static netdev_tx_t gmac_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	entry = priv->cur_tx % txsize;
 
-#ifdef XMIT_DEBUG
+#ifdef GMAC_TX_DEBUG
 	if ((skb->len > ETH_FRAME_LEN) || nfrags)
-		pr_info("gmac xmit:\n"
+		GMAC_INFO("gmac xmit:\n"
 		       "\tskb addr %p - len: %d - nopaged_len: %d\n"
 		       "\tn_frags: %d - ip_summed: %d - %s gso\n",
 		       skb, skb->len, nopaged_len, nfrags, skb->ip_summed,
@@ -991,9 +965,9 @@ static netdev_tx_t gmac_xmit(struct sk_buff *skb, struct net_device *dev)
 	desc = priv->dma_tx + entry;
 	first = desc;
 
-#ifdef XMIT_DEBUG
+#ifdef GMAC_TX_DEBUG
 	if ((nfrags > 0) || (skb->len > ETH_FRAME_LEN))
-		pr_debug("gmac xmit: skb len: %d, nopaged_len: %d,\n"
+		GMAC_DEBUG("gmac xmit: skb len: %d, nopaged_len: %d,\n"
 		       "\t\tn_frags: %d, ip_summed: %d\n",
 		       skb->len, nopaged_len, nfrags, skb->ip_summed);
 #endif
@@ -1016,7 +990,7 @@ static netdev_tx_t gmac_xmit(struct sk_buff *skb, struct net_device *dev)
 		entry = (++priv->cur_tx) % txsize;
 		desc = priv->dma_tx + entry;
 
-		TX_DBG("\t[entry %d] segment len: %d\n", entry, len);
+		GMAC_TX_INFO("\t[entry %d] segment len: %d\n", entry, len);
 		desc->desc2 = skb_frag_dma_map(priv->device, frag, 0,
 									len, DMA_TO_DEVICE);
 		priv->tx_skbuff[entry] = NULL;
@@ -1041,20 +1015,20 @@ static netdev_tx_t gmac_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	priv->cur_tx++;
 
-#ifdef XMIT_DEBUG
+#ifdef GMAC_TX_DEBUG
 	if (netif_msg_pktdata(priv)) {
-		pr_info("gmac xmit: current=%d, dirty=%d, entry=%d, "
+		GMAC_INFO("gmac xmit: current=%d, dirty=%d, entry=%d, "
 		       "first=%p, nfrags=%d\n",
 		       (priv->cur_tx % txsize), (priv->dirty_tx % txsize),
 		       entry, first, nfrags);
 		display_ring(priv->dma_tx, txsize);
-		pr_info(">>> frame to be transmitted: ");
+		GMAC_INFO(">>> frame to be transmitted: ");
 		print_pkt(skb->data, skb->len);
 	}
 #endif
 
 	if (unlikely(gmac_tx_avail(priv) <= (MAX_SKB_FRAGS + 1))) {
-		TX_DBG("%s: stop transmitted packets\n", __func__);
+		GMAC_TX_INFO("%s: stop transmitted packets\n", __func__);
 		netif_stop_queue(dev);
 	}
 
@@ -1097,7 +1071,7 @@ static inline void gmac_rx_refill(struct gmac_priv *priv)
 
 				gmac_refill_desc3(bfsize, p + entry);
 
-			RX_DBG("\trefill entry #%d\n", entry);
+			GMAX_RX_INFO("\trefill entry #%d\n", entry);
 		}
 		wmb();
 		desc_set_rx_own(p + entry);
@@ -1113,9 +1087,9 @@ static int gmac_rx(struct gmac_priv *priv, int limit)
 	dma_desc_t *p = priv->dma_rx + entry;
 	dma_desc_t *p_next;
 
-#ifdef RX_DEBUG
+#ifdef GMAC_RX_DEBUG
 	if (netif_msg_hw(priv)) {
-		pr_debug(">>> gmac_rx: descriptor ring:\n");
+		GMAC_DEBUG(">>> gmac_rx: descriptor ring:\n");
 		display_ring(priv->dma_rx, rxsize);
 	}
 #endif
@@ -1147,18 +1121,18 @@ static int gmac_rx(struct gmac_priv *priv, int limit)
 			 * Type frames (LLC/LLC-SNAP) */
 			if (unlikely(status != llc_snap))
 				frame_len -= ETH_FCS_LEN;
-#ifdef RX_DEBUG
+#ifdef GMAC_RX_DEBUG
 			if (frame_len > ETH_FRAME_LEN)
-				pr_debug("\tRX frame size %d, COE status: %d\n",
+				GMAC_DEBUG("\tRX frame size %d, COE status: %d\n",
 					frame_len, status);
 
 			if (netif_msg_hw(priv))
-				pr_debug("\tdesc: %p [entry %d] buff=0x%x\n",
+				GMAC_DEBUG("\tdesc: %p [entry %d] buff=0x%x\n",
 					p, entry, p->desc2);
 #endif
 			skb = priv->rx_skbuff[entry];
 			if (unlikely(!skb)) {
-				pr_err("%s: Inconsistent Rx descriptor chain\n",
+				GMAC_ERR("%s: Inconsistent Rx descriptor chain\n",
 					priv->ndev->name);
 				priv->ndev->stats.rx_dropped++;
 				break;
@@ -1170,9 +1144,9 @@ static int gmac_rx(struct gmac_priv *priv, int limit)
 			dma_unmap_single(priv->device,
 					 priv->rx_skbuff_dma[entry],
 					 priv->dma_buf_sz, DMA_FROM_DEVICE);
-#ifdef RX_DEBUG
+#ifdef GMAC_RX_DEBUG
 			if (netif_msg_pktdata(priv)) {
-				pr_info(" frame received (%dbytes)", frame_len);
+				GMAC_INFO(" frame received (%dbytes)", frame_len);
 				print_pkt(skb->data, frame_len);
 			}
 #endif
@@ -1250,13 +1224,13 @@ static int gmac_config(struct net_device *ndev, struct ifmap *map)
 
 	/* Don't allow changing the I/O address */
 	if (map->base_addr != ndev->base_addr) {
-		pr_warn( "%s: can't change I/O address\n", ndev->name);
+		GMAC_WARN( "%s: can't change I/O address\n", ndev->name);
 		return -EOPNOTSUPP;
 	}
 
 	/* Don't allow changing the IRQ */
 	if (map->irq != ndev->irq) {
-		pr_warn( "%s: can't change IRQ number %d\n",
+		GMAC_WARN( "%s: can't change IRQ number %d\n",
 		       ndev->name, ndev->irq);
 		return -EOPNOTSUPP;
 	}
@@ -1299,14 +1273,14 @@ static int gmac_change_mtu(struct net_device *ndev, int new_mtu)
 	int max_mtu;
 
 	if (netif_running(ndev)) {
-		pr_err("%s: must be stopped to change its MTU\n", ndev->name);
+		GMAC_ERR("%s: must be stopped to change its MTU\n", ndev->name);
 		return -EBUSY;
 	}
 
 	max_mtu = SKB_MAX_HEAD(NET_SKB_PAD + NET_IP_ALIGN);
 
 	if ((new_mtu < 46) || (new_mtu > max_mtu)) {
-		pr_err("%s: invalid MTU, max MTU is: %d\n", ndev->name, max_mtu);
+		GMAC_ERR("%s: invalid MTU, max MTU is: %d\n", ndev->name, max_mtu);
 		return -EINVAL;
 	}
 
@@ -1342,7 +1316,7 @@ static irqreturn_t gmac_interrupt(int irq, void *dev_id)
 	struct gmac_priv *priv = netdev_priv(dev);
 
 	if (unlikely(!dev)) {
-		pr_err("%s: invalid dev pointer\n", __func__);
+		GMAC_ERR("%s: invalid dev pointer\n", __func__);
 		return IRQ_NONE;
 	}
 
@@ -1453,7 +1427,7 @@ static int gmac_init_fs(struct net_device *dev)
 	gmac_fs_dir = debugfs_create_dir(GMAC_RESOURCE_NAME, NULL);
 
 	if (!gmac_fs_dir || IS_ERR(gmac_fs_dir)) {
-		pr_err("ERROR %s, debugfs create directory failed\n",
+		GMAC_ERR("ERROR %s, debugfs create directory failed\n",
 		       GMAC_RESOURCE_NAME);
 
 		return -ENOMEM;
@@ -1465,7 +1439,7 @@ static int gmac_init_fs(struct net_device *dev)
 					   &gmac_rings_status_fops);
 
 	if (!gmac_rings_status || IS_ERR(gmac_rings_status)) {
-		pr_info("ERROR creating gmac ring debugfs file\n");
+		GMAC_INFO("ERROR creating gmac ring debugfs file\n");
 		debugfs_remove(gmac_fs_dir);
 
 		return -ENOMEM;
@@ -1530,7 +1504,7 @@ struct gmac_priv *gmac_dvr_probe(struct device *device,
 
 	ndev = alloc_etherdev(sizeof(struct gmac_priv));
 	if (!ndev) {
-		pr_err( "ERROR: Allocating netdevice is failed!\n");
+		GMAC_ERR( "ERROR: Allocating netdevice is failed!\n");
 		return NULL;
 	}
 
@@ -1575,7 +1549,7 @@ struct gmac_priv *gmac_dvr_probe(struct device *device,
 	gmac_check_ether_addr(priv);
 	ret = register_netdev(ndev);
 	if (ret) {
-		pr_err( "ERROR: %i registering the device\n", ret);
+		GMAC_ERR( "ERROR: %i registering the device\n", ret);
 		goto error;
 	}
 
@@ -1708,10 +1682,10 @@ static int __init gmac_init(void)
 {
 #ifdef CONFIG_GMAC_SCRIPT_SYS
 	if (SCRIPT_PARSER_OK != script_parser_fetch("gmac_para", "gmac_used", &gmac_used, 1))
-		pr_warn( "emac_init fetch emac using configuration failed\n");
+		GMAC_WARN( "emac_init fetch emac using configuration failed\n");
 
 	if (!gmac_used) {
-		pr_info( "gmac driver is disabled\n");
+		GMAC_ERR( "gmac driver is disabled\n");
 		return 0;
 	}
 #endif
@@ -1723,7 +1697,7 @@ static int __init gmac_init(void)
 static void __exit gmac_remove(void)
 {
 	if (gmac_used != 1) {
-		pr_info("gmac is disabled\n");
+		GMAC_ERR("gmac is disabled\n");
 		return;
 	}
 	platform_driver_unregister(&gmac_driver);

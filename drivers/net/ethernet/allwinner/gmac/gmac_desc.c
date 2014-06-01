@@ -49,7 +49,7 @@ int desc_get_tx_status(void *data, struct gmac_extra_stats *x,
 	}
 
 	if (p->desc0.tx.vlan_tag) {
-		pr_info("GMAC TX status: VLAN frame\n");
+		GMAC_INFO("GMAC TX status: VLAN frame\n");
 		x->tx_vlan++;
 	}
 
@@ -74,7 +74,7 @@ int desc_get_rx_status(void *data, struct gmac_extra_stats *x, dma_desc_t *p)
 	struct net_device_stats *stats = (struct net_device_stats *)data;
 
 	if (unlikely(p->desc0.rx.last_desc == 0)) {
-		pr_warning("ndesc Error: Oversized Ethernet "
+		GMAC_WARN("ndesc Error: Oversized Ethernet "
 			   "frame spanned multiple buffers\n");
 		stats->rx_length_errors++;
 		return discard_frame;

@@ -34,6 +34,38 @@
 
 #define GMAC_RESOURCE_NAME	"sunxi_gmac"
 
+#undef GMAC_DEBUG	/* Define to enable debugging */
+#undef GMAC_RX_DEBUG	/* Define to enable RX debugging */
+#undef GMAC_TX_DEBUG	/* Define to enable TX debugging */
+
+#define GMAC_ERR(fmt, args...)		pr_err(fmt, ## args)
+
+#ifdef GMAC_DEBUG
+#define GMAC_INFO(fmt, args...)		pr_info(fmt, ## args)
+#define GMAC_WARN(fmt, args...)		pr_warn(fmt, ## args)
+#define GMAC_DEBUG(fmt, args...)	pr_debug(fmt, ## args)
+#define GMAC_CORE_DEBUG(fmt, args...)	((void)(netif_msg_probe(priv) && pr_debug(fmt, ## args)))
+#define GMAC_CORE_INFO(fmt, args...)	((void)(netif_msg_probe(priv) && pr_info(fmt, ## args)))
+#else
+#define GMAC_INFO(fmt, args...)		do { } while (0)
+#define GMAC_WARN(fmt, args...)		do { } while (0)
+#define GMAC_DEBUG(fmt, args...)	do { } while (0)
+#define GMAC_CORE_DEBUG(fmt, args...)	do { } while (0)
+#define GMAC_CORE_INFO(fmt, args...)	do { } while (0)
+#endif
+
+#ifdef GMAC_RX_DEBUG
+#define GMAX_RX_INFO(fmt, args...)  GMAC_INFO(fmt, ## args)
+#else
+#define GMAX_RX_INFO(fmt, args...)  do { } while (0)
+#endif
+
+#ifdef GMAC_TX_DEBUG
+#define GMAC_TX_INFO(fmt, args...)  GMAC_INFO(fmt, ## args)
+#else
+#define GMAC_TX_INFO(fmt, args...)  do { } while (0)
+#endif
+
 enum rx_frame_status { /* IPC status */
 	good_frame = 0,
 	discard_frame = 1,

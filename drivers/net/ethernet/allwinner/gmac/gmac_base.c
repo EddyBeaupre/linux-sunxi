@@ -24,13 +24,6 @@
 #include "sunxi_gmac.h"
 #include "gmac_desc.h"
 
-#undef GMAC_BASE_DEBUG
-#ifdef GMAC_BASE_DEBUG
-#define BASE_DBG(fmt, args...)  pr_info(fmt, ## args)
-#else
-#define BASE_DBG(fmt, args...)  do { } while (0)
-#endif
-
 /*
  *
  * Sun6i platform gmac dma operations
@@ -79,14 +72,14 @@ void dma_oper_mode(void __iomem *ioaddr, int txmode,
 	u32 op_val = readl(ioaddr + GDMA_OP_MODE);
 
 	if (txmode == SF_DMA_MODE) {
-		pr_debug( "GMAC: enable TX store and forward mode\n");
+		GMAC_DEBUG( "GMAC: enable TX store and forward mode\n");
 		/* Transmit COE type 2 cannot be done in cut-through mode. */
 		op_val |= OP_MODE_TSF;
 		/* Operating on second frame increase the performance
 		 * especially when transmit store-and-forward is used.*/
 		op_val |= OP_MODE_OSF;
 	} else {
-		pr_debug( "GMAC: disabling TX store and forward mode"
+		GMAC_DEBUG( "GMAC: disabling TX store and forward mode"
 			      " (threshold = %d)\n", txmode);
 		op_val &= ~OP_MODE_TSF;
 		op_val &= OP_MODE_TC_TX_MASK;
@@ -104,10 +97,10 @@ void dma_oper_mode(void __iomem *ioaddr, int txmode,
 	}
 
 	if (rxmode == SF_DMA_MODE) {
-		pr_debug( "GMAC: enable RX store and forward mode\n");
+		GMAC_DEBUG( "GMAC: enable RX store and forward mode\n");
 		op_val |= OP_MODE_RSF;
 	} else {
-		pr_debug( "GMAC: disabling RX store and forward mode"
+		GMAC_DEBUG( "GMAC: disabling RX store and forward mode"
 			      " (threshold = %d)\n", rxmode);
 		op_val &= ~OP_MODE_RSF;
 		op_val &= OP_MODE_TC_RX_MASK;
@@ -132,24 +125,24 @@ static void show_tx_process_state(unsigned int status)
 
 	switch (state) {
 	case 0:
-		pr_debug("- TX (Stopped): Reset or Stop command\n");
+		GMAC_DEBUG("- TX (Stopped): Reset or Stop command\n");
 		break;
 	case 1:
-		pr_debug("- TX (Running):Fetching the Tx desc\n");
+		GMAC_DEBUG("- TX (Running):Fetching the Tx desc\n");
 		break;
 	case 2:
-		pr_debug("- TX (Running): Waiting for end of tx\n");
+		GMAC_DEBUG("- TX (Running): Waiting for end of tx\n");
 		break;
 	case 3:
-		pr_debug("- TX (Running): Reading the data "
+		GMAC_DEBUG("- TX (Running): Reading the data "
 		       "and queuing the data into the Tx buf\n");
 		break;
 	case 6:
-		pr_debug("- TX (Suspended): Tx Buff Underflow "
+		GMAC_DEBUG("- TX (Suspended): Tx Buff Underflow "
 		       "or an unavailable Transmit descriptor\n");
 		break;
 	case 7:
-		pr_debug("- TX (Running): Closing Tx descriptor\n");
+		GMAC_DEBUG("- TX (Running): Closing Tx descriptor\n");
 		break;
 	default:
 		break;
@@ -163,29 +156,29 @@ static void show_rx_process_state(unsigned int status)
 
 	switch (state) {
 	case 0:
-		pr_debug("- RX (Stopped): Reset or Stop command\n");
+		GMAC_DEBUG("- RX (Stopped): Reset or Stop command\n");
 		break;
 	case 1:
-		pr_debug("- RX (Running): Fetching the Rx desc\n");
+		GMAC_DEBUG("- RX (Running): Fetching the Rx desc\n");
 		break;
 	case 2:
-		pr_debug("- RX (Running):Checking for end of pkt\n");
+		GMAC_DEBUG("- RX (Running):Checking for end of pkt\n");
 		break;
 	case 3:
-		pr_debug("- RX (Running): Waiting for Rx pkt\n");
+		GMAC_DEBUG("- RX (Running): Waiting for Rx pkt\n");
 		break;
 	case 4:
-		pr_debug("- RX (Suspended): Unavailable Rx buf\n");
+		GMAC_DEBUG("- RX (Suspended): Unavailable Rx buf\n");
 		break;
 	case 5:
-		pr_debug("- RX (Running): Closing Rx descriptor\n");
+		GMAC_DEBUG("- RX (Running): Closing Rx descriptor\n");
 		break;
 	case 6:
-		pr_debug("- RX(Running): Flushing the current frame"
+		GMAC_DEBUG("- RX(Running): Flushing the current frame"
 		       " from the Rx buf\n");
 		break;
 	case 7:
-		pr_debug("- RX (Running): Queuing the Rx frame"
+		GMAC_DEBUG("- RX (Running): Queuing the Rx frame"
 		       " from the Rx buf into memory\n");
 		break;
 	default:
@@ -200,7 +193,7 @@ int dma_interrupt(void __iomem *ioaddr, struct gmac_extra_stats *x)
 	/* read the status register (CSR5) */
 	u32 intr_status = readl(ioaddr + GDMA_STATUS);
 
-	BASE_DBG( "%s: [CSR5: 0x%08x]\n", __func__, intr_status);
+	GMAC_INFO( "%s: [CSR5: 0x%08x]\n", __func__, intr_status);
 #ifdef DWMAC_DMA_DEBUG
 	/* It displays the DMA process states (CSR5 register) */
 	show_tx_process_state(intr_status);
@@ -208,43 +201,43 @@ int dma_interrupt(void __iomem *ioaddr, struct gmac_extra_stats *x)
 #endif
 	/* ABNORMAL interrupts */
 	if (unlikely(intr_status & GDMA_STAT_AIS)) {
-		BASE_DBG( "CSR5[15] DMA ABNORMAL IRQ: ");
+		GMAC_INFO( "CSR5[15] DMA ABNORMAL IRQ: ");
 		if (unlikely(intr_status & GDMA_STAT_UNF)) {
-			BASE_DBG( "transmit underflow\n");
+			GMAC_INFO( "transmit underflow\n");
 			ret = tx_hard_error_bump_tc;
 			x->tx_undeflow_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_TJT)) {
-			BASE_DBG( "transmit jabber\n");
+			GMAC_INFO( "transmit jabber\n");
 			x->tx_jabber_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_OVF)) {
-			BASE_DBG( "recv overflow\n");
+			GMAC_INFO( "recv overflow\n");
 			x->rx_overflow_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_RU)) {
-			BASE_DBG( "receive buffer unavailable\n");
+			GMAC_INFO( "receive buffer unavailable\n");
 			x->rx_buf_unav_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_RPS)) {
-			BASE_DBG( "receive process stopped\n");
+			GMAC_INFO( "receive process stopped\n");
 			x->rx_process_stopped_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_RWT)) {
-			BASE_DBG( "receive watchdog\n");
+			GMAC_INFO( "receive watchdog\n");
 			x->rx_watchdog_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_ETI)) {
-			BASE_DBG( "transmit early interrupt\n");
+			GMAC_INFO( "transmit early interrupt\n");
 			x->tx_early_irq++;
 		}
 		if (unlikely(intr_status & GDMA_STAT_TPS)) {
-			BASE_DBG( "transmit process stopped\n");
+			GMAC_INFO( "transmit process stopped\n");
 			x->tx_process_stopped_irq++;
 			ret = tx_hard_error;
 		}
 		if (unlikely(intr_status & GDMA_STAT_FBI)) {
-			BASE_DBG( "fatal bus error\n");
+			GMAC_INFO( "fatal bus error\n");
 			x->fatal_bus_error_irq++;
 			ret = tx_hard_error;
 		}
@@ -258,11 +251,11 @@ int dma_interrupt(void __iomem *ioaddr, struct gmac_extra_stats *x)
 	}
 	/* Optional hardware blocks, interrupts should be disabled */
 	if (unlikely(intr_status & (GDMA_STAT_GLI)))
-		pr_info("%s: unexpected status %08x\n", __func__, intr_status);
+		GMAC_INFO("%s: unexpected status %08x\n", __func__, intr_status);
 	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
 	writel((intr_status & 0x1ffff), ioaddr + GDMA_STATUS);
 
-	BASE_DBG( "\n\n");
+	GMAC_INFO( "\n\n");
 	return ret;
 }
 
@@ -277,13 +270,12 @@ void dma_flush_tx_fifo(void __iomem *ioaddr)
 void dma_dump_regs(void __iomem *ioaddr)
 {
 	int i;
-	pr_info(" DMA registers\n");
+	GMAC_INFO(" DMA registers\n");
 	for (i = 0; i < 22; i++) {
 		if ((i < 9) || (i > 17)) {
-			int offset = i * 4;
-			pr_err("\t Reg No. %d (offset 0x%x): 0x%08x\n", i,
-			       (GDMA_BUS_MODE + offset),
-			       readl(ioaddr + GDMA_BUS_MODE + offset));
+			GMAC_INFO("\t Reg No. %d (offset 0x%x): 0x%08x\n", i,
+			       (GDMA_BUS_MODE + (i * 4)),
+			       readl(ioaddr + GDMA_BUS_MODE + (i * 4)));
 		}
 	}
 }
@@ -324,12 +316,11 @@ int core_en_rx_coe(void __iomem *ioaddr)
 void core_dump_regs(void __iomem *ioaddr)
 {
 	int i;
-	pr_info("\tDWMAC1000 regs (base addr = 0x%p)\n", ioaddr);
+	GMAC_INFO("\tDWMAC1000 regs (base addr = 0x%p)\n", ioaddr);
 
 	for (i = 0; i < 55; i++) {
-		int offset = i * 4;
-		pr_info("\tReg No. %d (offset 0x%x): 0x%08x\n", i,
-			offset, readl(ioaddr + offset));
+		GMAC_INFO("\tReg No. %d (offset 0x%x): 0x%08x\n", i,
+			offset, readl(ioaddr + (i * 4)));
 	}
 }
 
@@ -338,7 +329,7 @@ void core_set_filter(struct net_device *dev)
 	void __iomem *ioaddr = (void __iomem *) dev->base_addr;
 	unsigned int value = 0;
 
-	pr_debug( "%s: # mcasts %d, # unicast %d\n",
+	GMAC_DEBUG( "%s: # mcasts %d, # unicast %d\n",
 		 __func__, netdev_mc_count(dev), netdev_uc_count(dev));
 
 	if (dev->flags & IFF_PROMISC)
@@ -391,7 +382,7 @@ void core_set_filter(struct net_device *dev)
 #endif
 	writel(value, ioaddr + GMAC_FRAME_FILTER);
 
-	pr_debug( "\tFrame Filter reg: 0x%08x\n\tHash regs: "
+	GMAC_DEBUG( "\tFrame Filter reg: 0x%08x\n\tHash regs: "
 	    "HI 0x%08x, LO 0x%08x\n", readl(ioaddr + GMAC_FRAME_FILTER),
 	    readl(ioaddr + GMAC_HASH_HIGH), readl(ioaddr + GMAC_HASH_LOW));
 }
@@ -401,18 +392,18 @@ void core_flow_ctrl(void __iomem *ioaddr, unsigned int duplex,
 {
 	unsigned int flow = 0;
 
-	pr_debug( "GMAC Flow-Control:\n");
+	GMAC_DEBUG( "GMAC Flow-Control:\n");
 	if (fc & FLOW_RX) {
-		pr_debug( "\tReceive Flow-Control ON\n");
+		GMAC_DEBUG( "\tReceive Flow-Control ON\n");
 		flow |= GMAC_FLOW_CTRL_RFE;
 	}
 	if (fc & FLOW_TX) {
-		pr_debug( "\tTransmit Flow-Control ON\n");
+		GMAC_DEBUG( "\tTransmit Flow-Control ON\n");
 		flow |= GMAC_FLOW_CTRL_TFE;
 	}
 
 	if (duplex) {
-		pr_debug( "\tduplex mode: PAUSE %d\n", pause_time);
+		GMAC_DEBUG( "\tduplex mode: PAUSE %d\n", pause_time);
 		flow |= (pause_time << GMAC_FLOW_CTRL_PT_SHIFT);
 	}
 
