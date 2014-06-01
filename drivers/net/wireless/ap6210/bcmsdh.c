@@ -81,7 +81,7 @@ bcmsdh_config_hw_oob_intr(bcmsdh_info_t *sdh, uint chip)
 {
 	uint32 gpiocontrol, addr;
 
- 	printf("%s: Enter\n", __FUNCTION__);
+ 	pr_info("%s: Enter\n", __FUNCTION__);
 	if (CHIPID(chip) == BCM43362_CHIP_ID) {
 		addr = SI_ENUM_BASE + OFFSETOF(chipcregs_t, gpiocontrol);
 		gpiocontrol = bcmsdh_reg_read(sdh, addr, 4);

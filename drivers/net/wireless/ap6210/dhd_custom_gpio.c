@@ -39,8 +39,8 @@
 
 #include <ap6210_gpio.h>
 
-#define WL_ERROR(x) printf x
-#define WL_TRACE(x) printf x
+#define WL_ERROR(x) pr_info x
+#define WL_TRACE(x) pr_info x
 
 extern void sunximmc_rescan_card(unsigned id, unsigned insert);
 

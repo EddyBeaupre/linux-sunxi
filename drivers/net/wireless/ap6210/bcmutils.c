@@ -1053,7 +1053,7 @@ prpkt(const char *msg, osl_t *osh, void *p0)
 	void *p;
 
 	if (msg && (msg[0] != '\0'))
-		printf("%s:\n", msg);
+		pr_info("%s:\n", msg);
 
 	for (p = p0; p; p = PKTNEXT(osh, p))
 		prhex(NULL, PKTDATA(osh, p), PKTLEN(osh, p));
@@ -1660,7 +1660,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 	uint i;
 
 	if (msg && (msg[0] != '\0'))
-		printf("%s:\n", msg);
+		pr_info("%s:\n", msg);
 
 	p = line;
 	for (i = 0; i < nbytes; i++) {
@@ -1676,7 +1676,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 		}
 
 		if (i % 16 == 15) {
-			printf("%s\n", line);		/* flush line */
+			pr_info("%s\n", line);		/* flush line */
 			p = line;
 			len = sizeof(line);
 		}
@@ -1684,7 +1684,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 
 	/* flush last partial line */
 	if (p != line)
-		printf("%s\n", line);
+		pr_info("%s\n", line);
 }
 
 static const char *crypto_algo_names[] = {
@@ -1750,14 +1750,14 @@ printbig(char *buf)
 	while (len > max_len) {
 		c = buf[max_len];
 		buf[max_len] = '\0';
-		printf("%s", buf);
+		pr_info("%s", buf);
 		buf[max_len] = c;
 
 		buf += max_len;
 		len -= max_len;
 	}
 	/* print the remaining string */
-	printf("%s\n", buf);
+	pr_info("%s\n", buf);
 	return;
 }
 
@@ -1993,16 +1993,16 @@ bcm_print_bytes(const char *name, const uchar *data, int len)
 	int i;
 	int per_line = 0;
 
-	printf("%s: %d \n", name ? name : "", len);
+	pr_info("%s: %d \n", name ? name : "", len);
 	for (i = 0; i < len; i++) {
-		printf("%02x ", *data++);
+		pr_info("%02x ", *data++);
 		per_line++;
 		if (per_line == 16) {
 			per_line = 0;
-			printf("\n");
+			pr_info("\n");
 		}
 	}
-	printf("\n");
+	pr_info("\n");
 }
 #if defined(WLTINYDUMP) || defined(WLMSG_INFORM) || defined(WLMSG_ASSOC) || \
 	defined(WLMSG_PRPKT) || defined(WLMSG_WSEC)

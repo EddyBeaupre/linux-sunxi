@@ -1851,7 +1851,7 @@ dhd_bus_txdata(struct dhd_bus *bus, void *pkt, bool wlfc_locked)
 	for (i = 0; i < (datalen - 4); i++) {
 		DHD_ERROR(("%02X ", dump_data[i]));
 		if ((i & 15) == 15)
-			printk("\n");
+			DHD_ERROR("\n");
 	}
 	DHD_ERROR(("\n"));
 
@@ -2811,7 +2811,7 @@ dhdsdio_readconsole(dhd_bus_t *bus)
 			if (line[n - 1] == '\r')
 				n--;
 			line[n] = 0;
-			printf("CONSOLE: %s\n", line);
+			pr_info("CONSOLE: %s\n", line);
 		}
 	}
 break2:
@@ -2973,7 +2973,7 @@ dhdsdio_checkdied(dhd_bus_t *bus, char *data, uint size)
 					 */
 
 					if (dhd_msg_level & DHD_ERROR_VAL)
-						printf("CONSOLE: %s\n", line);
+						pr_info("CONSOLE: %s\n", line);
 				}
 			}
 		}
@@ -6013,7 +6013,7 @@ dhdsdio_pktgen(dhd_bus_t *bus)
 	/* Display current count if appropriate */
 	if (bus->pktgen_print && (++bus->pktgen_ptick >= bus->pktgen_print)) {
 		bus->pktgen_ptick = 0;
-		printf("%s: send attempts %d, rcvd %d, errors %d\n",
+		pr_info("%s: send attempts %d, rcvd %d, errors %d\n",
 		       __FUNCTION__, bus->pktgen_sent, bus->pktgen_rcvd, bus->pktgen_fail);
 
 		/* Print throughput stats only for constant length packet runs */
@@ -6025,7 +6025,7 @@ dhdsdio_pktgen(dhd_bus_t *bus)
 			rcvd_pkts = bus->pktgen_rcvd - bus->pktgen_prev_rcvd;
 			bus->pktgen_prev_rcvd = bus->pktgen_rcvd;
 
-			printf("%s: Tx Throughput %d kbps, Rx Throughput %d kbps\n",
+			pr_info("%s: Tx Throughput %d kbps, Rx Throughput %d kbps\n",
 			  __FUNCTION__,
 			  (sent_pkts * bus->pktgen_len / jiffies_to_msecs(time_lapse)) * 8,
 			  (rcvd_pkts * bus->pktgen_len  / jiffies_to_msecs(time_lapse)) * 8);
@@ -7051,7 +7051,7 @@ dhd_bus_select_firmware_name_by_chip(struct dhd_bus *bus, char *dst, char *src)
 		if (src[0] == '\0')
 #endif
 		{
-			printf("src firmware path is null\n");
+			pr_info("src firmware path is null\n");
 			return;
 		}
 	}
@@ -7105,7 +7105,7 @@ dhd_bus_select_firmware_name_by_chip(struct dhd_bus *bus, char *dst, char *src)
 			break;
 	}
 
-	printf("%s: firmware_path=%s\n", __FUNCTION__, dst);
+	pr_info("%s: firmware_path=%s\n", __FUNCTION__, dst);
 }
 
 bool
@@ -7132,8 +7132,8 @@ dhdsdio_download_firmware(struct dhd_bus *bus, osl_t *osh, void *sdh)
 	/* Download the firmware */
 	dhdsdio_clkctl(bus, CLK_AVAIL, FALSE);
 
-	printk("Final fw_path=%s\n", bus->fw_path);
-	printk("Final nv_path=%s\n", bus->nv_path);
+	pr_info("Final fw_path=%s\n", bus->fw_path);
+	pr_info("Final nv_path=%s\n", bus->nv_path);
 	ret = _dhdsdio_download_firmware(bus) == 0;
 
 	dhdsdio_clkctl(bus, CLK_SDONLY, FALSE);

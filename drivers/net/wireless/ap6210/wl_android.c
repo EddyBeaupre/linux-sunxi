@@ -67,22 +67,22 @@ uint android_msg_level = ANDROID_ERROR_LEVEL;
 #define ANDROID_ERROR(x) \
 	do { \
 		if (android_msg_level & ANDROID_ERROR_LEVEL) { \
-			printk(KERN_ERR "ANDROID-ERROR) ");	\
-			printk x; \
+			pr_err("ANDROID-ERROR) ");	\
+			pr_err x; \
 		} \
 	} while (0)
 #define ANDROID_TRACE(x) \
 	do { \
 		if (android_msg_level & ANDROID_TRACE_LEVEL) { \
-			printk(KERN_ERR "ANDROID-TRACE) ");	\
-			printk x; \
+			pr_err("ANDROID-TRACE) ");	\
+			pr_err x; \
 		} \
 	} while (0)
 #define ANDROID_INFO(x) \
 	do { \
 		if (android_msg_level & ANDROID_INFO_LEVEL) { \
-			printk(KERN_ERR "ANDROID-INFO) ");	\
-			printk x; \
+			pr_err("ANDROID-INFO) ");	\
+			pr_err x; \
 		} \
 	} while (0)
 
@@ -346,8 +346,8 @@ static int wl_android_set_pno_setup(struct net_device *dev, char *command, int t
 #ifdef PNO_SET_DEBUG
 	memcpy(command, pno_in_example, sizeof(pno_in_example));
 	for (i = 0; i < sizeof(pno_in_example); i++)
-		printf("%02X ", command[i]);
-	printf("\n");
+		pr_info("%02X ", command[i]);
+	pr_info("\n");
 	total_len = sizeof(pno_in_example);
 #endif
 
@@ -431,7 +431,7 @@ int wl_android_wifi_on(struct net_device *dev)
 	int ret = 0;
 	int retry = POWERUP_MAX_RETRY;
 
-	printk("%s in\n", __FUNCTION__);
+	pr_debug("%s in\n", __FUNCTION__);
 	if (!dev) {
 		ANDROID_ERROR(("%s: dev is null\n", __FUNCTION__));
 		return -EINVAL;
@@ -470,14 +470,14 @@ int wl_android_wifi_on(struct net_device *dev)
 
 exit:
 	dhd_net_if_unlock(dev);
-	printk("%s: Success\n", __FUNCTION__);
+	pr_debug("%s: Success\n", __FUNCTION__);
 	return ret;
 err:
 	dhd_dev_reset(dev, TRUE);
 	sdioh_stop(NULL);
 	dhd_customer_gpio_wlan_ctrl(WLAN_RESET_OFF);
 	dhd_net_if_unlock(dev);
-	printk("%s: Failed\n", __FUNCTION__);
+	pr_debug("%s: Failed\n", __FUNCTION__);
 
 	return ret;
 }
@@ -486,7 +486,7 @@ int wl_android_wifi_off(struct net_device *dev)
 {
 	int ret = 0;
 
-	printk("%s in\n", __FUNCTION__);
+	pr_debug("%s in\n", __FUNCTION__);
 	if (!dev) {
 		ANDROID_TRACE(("%s: dev is null\n", __FUNCTION__));
 		return -EINVAL;

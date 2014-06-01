@@ -27,12 +27,12 @@
 #ifndef __BCMSDH_SDMMC_H__
 #define __BCMSDH_SDMMC_H__
 
-#define sd_err(x)   printf x
-#define sd_trace(x)
-#define sd_info(x)
-#define sd_debug(x)
-#define sd_data(x)
-#define sd_ctrl(x)
+#define sd_err(x)   pr_err x
+#define sd_trace(x) pr_debug x
+#define sd_info(x) pr_info x
+#define sd_debug(x) pr_info x
+#define sd_data(x) pr_debug x
+#define sd_ctrl(x) pr_debug x
 
 #define sd_trace_hw4	sd_trace
 
@@ -49,7 +49,7 @@ extern void sdioh_sdmmc_osfree(sdioh_info_t *sd);
 
 #define SDIOH_ASSERT(exp) \
 	do { if (!(exp)) \
-		printf("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); \
+		pr_info("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); \
 	} while (0)
 
 #define BLOCK_SIZE_4318 64

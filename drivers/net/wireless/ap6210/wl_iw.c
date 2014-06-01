@@ -2474,7 +2474,7 @@ wl_iw_set_pmksa(
 			eabuf)));
 		for (j = 0; j < WPA2_PMKID_LEN; j++)
 			WL_TRACE(("%02x ", pmkid_array[i].PMKID[j]));
-		printf("\n");
+		WL_TRACE("\n");
 	}
 	WL_TRACE(("\n"));
 	dev_wlc_bufvar_set(dev, "pmkid_info", (char *)&pmkid_list, sizeof(pmkid_list));

@@ -27,12 +27,12 @@
 #ifndef	_siutils_priv_h_
 #define	_siutils_priv_h_
 
-#define	SI_ERROR(args) printf args
+#define	SI_ERROR(args) pr_info args
 
 #define	SI_MSG(args)
 
 #ifdef BCMDBG_SI
-#define	SI_VMSG(args)	printf args
+#define	SI_VMSG(args)	pr_info args
 #else
 #define	SI_VMSG(args)
 #endif

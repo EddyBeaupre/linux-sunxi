@@ -348,16 +348,16 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 		break;
 
 	case IOV_GVAL(IOV_WLMSGLEVEL):
-		printk("android_msg_level=0x%x\n", android_msg_level);
+		pr_debug("android_msg_level=0x%x\n", android_msg_level);
 #if defined(CONFIG_WIRELESS_EXT)
 		int_val = (int32)iw_msg_level;
 		bcopy(&int_val, arg, val_size);
-		printk("iw_msg_level=0x%x\n", iw_msg_level);
+		pr_debug("iw_msg_level=0x%x\n", iw_msg_level);
 #endif
 #ifdef WL_CFG80211
 		int_val = (int32)wl_dbg_level;
 		bcopy(&int_val, arg, val_size);
-		printk("cfg_msg_level=0x%x\n", wl_dbg_level);
+		pr_debug("cfg_msg_level=0x%x\n", wl_dbg_level);
 #endif
 		break;
 
@@ -365,7 +365,7 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 #if defined(CONFIG_WIRELESS_EXT)
 		if (int_val & DHD_IW_VAL) {
 			iw_msg_level = (uint)(int_val & 0xFFFF);
-			printk("iw_msg_level=0x%x\n", iw_msg_level);
+			pr_debug("iw_msg_level=0x%x\n", iw_msg_level);
 		} else
 #endif
 #ifdef WL_CFG80211
@@ -375,7 +375,7 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 #endif
 		{
 			android_msg_level = (uint)int_val;
-			printk("android_msg_level=0x%x\n", android_msg_level);
+			pr_debug("android_msg_level=0x%x\n", android_msg_level);
 		}
 		break;
 
@@ -553,7 +553,7 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 
 	case IOV_SVAL(IOV_WLPKTDLYSTAT_SZ):
 		dhd_pub->htsfdlystat_sz = int_val & 0xff;
-		printf("Setting tsfdlystat_sz:%d\n", dhd_pub->htsfdlystat_sz);
+		pr_debug("Setting tsfdlystat_sz:%d\n", dhd_pub->htsfdlystat_sz);
 		break;
 #endif
 	case IOV_SVAL(IOV_CHANGEMTU):
@@ -968,7 +968,7 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		memcpy(&hdr, buf, MSGTRACE_HDRLEN);
 
 		if (hdr.version != MSGTRACE_VERSION) {
-			printf("\nMACEVENT: %s [unsupported version --> "
+			pr_debug("\nMACEVENT: %s [unsupported version --> "
 			       "dhd version:%d dongle version:%d]\n",
 			       event_name, MSGTRACE_VERSION, hdr.version);
 			/* Reset datalen to avoid display below */
@@ -980,14 +980,14 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		buf[MSGTRACE_HDRLEN + ntoh16(hdr.len)] = '\0';
 
 		if (ntoh32(hdr.discarded_bytes) || ntoh32(hdr.discarded_printf)) {
-			printf("\nWLC_E_TRACE: [Discarded traces in dongle -->"
+			pr_debug("\nWLC_E_TRACE: [Discarded traces in dongle -->"
 			       "discarded_bytes %d discarded_printf %d]\n",
 			       ntoh32(hdr.discarded_bytes), ntoh32(hdr.discarded_printf));
 		}
 
 		nblost = ntoh32(hdr.seqnum) - seqnum_prev - 1;
 		if (nblost > 0) {
-			printf("\nWLC_E_TRACE: [Event lost --> seqnum %d nblost %d\n",
+			pr_debug("\nWLC_E_TRACE: [Event lost --> seqnum %d nblost %d\n",
 			       ntoh32(hdr.seqnum), nblost);
 		}
 		seqnum_prev = ntoh32(hdr.seqnum);
@@ -998,10 +998,10 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		p = (char *)&buf[MSGTRACE_HDRLEN];
 		while ((s = strstr(p, "\n")) != NULL) {
 			*s = '\0';
-			printf("%s\n", p);
+			pr_debug("%s\n", p);
 			p = s+1;
 		}
-		printf("%s\n", p);
+		pr_debug("%s\n", p);
 
 		/* Reset datalen to avoid display below */
 		datalen = 0;
@@ -1237,16 +1237,16 @@ dhd_print_buf(void *pbuf, int len, int bytes_per_line)
 	}
 
 	for (i = 0; i < len; i++) {
-		printf("%2.2x", *buf++);
+		pr_debug("%2.2x", *buf++);
 		j++;
 		if (j == bytes_per_line) {
-			printf("\n");
+			pr_debug("\n");
 			j = 0;
 		} else {
-			printf(":");
+			pr_debug(":");
 		}
 	}
-	printf("\n");
+	pr_debug("\n");
 #endif /* DHD_DEBUG */
 }
 
@@ -2234,7 +2234,7 @@ wl_iw_parse_channel_list(char** list_str, uint16* channel_list, int channel_num)
 	while (strncmp(str, GET_NPROBE, strlen(GET_NPROBE))) {
 		val = (int)strtoul(str, &endptr, 0);
 		if (endptr == str) {
-			printf("could not parse channel number starting at"
+			pr_debug("could not parse channel number starting at"
 				" substring \"%s\" in list:\n%s\n",
 				str, *list_str);
 			return -1;

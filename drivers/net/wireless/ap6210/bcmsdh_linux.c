@@ -84,7 +84,7 @@ static bcmsdh_hc_t *sdhcinfo = NULL;
 static bcmsdh_driver_t drvinfo = {NULL, NULL};
 
 /* debugging macros */
-#define SDLX_MSG(x) printf x
+#define SDLX_MSG(x) pr_info x
 
 /**
  * Checks to see if vendor and device IDs match a supported SDIO Host Controller.
@@ -127,7 +127,7 @@ bcmsdh_chipmatch(uint16 vendor, uint16 device)
 #ifdef BCMSDIOH_SPI
 	/* This is the PciSpiHost. */
 	if (device == SPIH_FPGA_ID && vendor == VENDOR_BROADCOM) {
-		printf("Found PCI SPI Host Controller\n");
+		pr_info("Found PCI SPI Host Controller\n");
 		return (TRUE);
 	}
 

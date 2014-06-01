@@ -196,14 +196,14 @@
 	(((txs)->status.suppr_ind != 0) ? WLFC_CTL_PKTFLAG_D11SUPPRESS : WLFC_CTL_PKTFLAG_DISCARD)
 
 #ifdef PROP_TXSTATUS_DEBUG
-#define WLFC_DBGMESG(x) printf x
+#define WLFC_DBGMESG(x) pr_info x
 /* wlfc-breadcrumb */
 #define WLFC_BREADCRUMB(x) do {if ((x) == NULL) \
-	{printf("WLFC: %s():%d:caller:%p\n", \
+	{pr_info("WLFC: %s():%d:caller:%p\n", \
 	__FUNCTION__, __LINE__, __builtin_return_address(0));}} while (0)
-#define WLFC_PRINTMAC(banner, ea) do {printf("%s MAC: [%02x:%02x:%02x:%02x:%02x:%02x]\n", \
+#define WLFC_PRINTMAC(banner, ea) do {pr_info("%s MAC: [%02x:%02x:%02x:%02x:%02x:%02x]\n", \
 	banner, ea[0], 	ea[1], 	ea[2], 	ea[3], 	ea[4], 	ea[5]); } while (0)
-#define WLFC_WHEREIS(s) printf("WLFC: at %s():%d, %s\n", __FUNCTION__, __LINE__, (s))
+#define WLFC_WHEREIS(s) pr_info("WLFC: at %s():%d, %s\n", __FUNCTION__, __LINE__, (s))
 #else
 #define WLFC_DBGMESG(x)
 #define WLFC_BREADCRUMB(x)

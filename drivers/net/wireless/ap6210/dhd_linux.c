@@ -2680,7 +2680,7 @@ dhd_open(struct net_device *net)
 	mutex_lock(&_dhd_sdio_mutex_lock_);
 #endif 
 
-  printk("%s, firmware path %s\n", __func__, firmware_path);
+        pr_info("%s, firmware path %s\n", __func__, firmware_path);
 
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	/* Update FW path if it was changed */
@@ -2951,7 +2951,7 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 	dhd_attach_states_t dhd_state = DHD_ATTACH_STATE_INIT;
 	DHD_TRACE(("%s: Enter\n", __FUNCTION__));
 
-  printk("%s, firmware path %s\n", __func__, firmware_path);
+	pr_info("%s, firmware path %s\n", __func__, firmware_path);
 
 	/* updates firmware nvram path if it was provided as module parameters */
 	if ((firmware_path != NULL) && (firmware_path[0] != '\0'))
@@ -4123,7 +4123,7 @@ dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
 		DHD_ERROR(("couldn't register the net device, err %d\n", err));
 		goto fail;
 	}
-	printf("Broadcom Dongle Host Driver: register interface [%s]"
+	pr_info("Broadcom Dongle Host Driver: register interface [%s]"
 		" MAC: "MACDBG"\n",
 		net->name,
 		MAC2STRDBG(net->dev_addr));
@@ -4481,7 +4481,7 @@ dhd_module_init(void)
 	error = dhd_bus_register();
 
 	if (!error)
-		printf("\n%s\n", dhd_version);
+		pr_info("\n%s\n", dhd_version);
 	else {
 		DHD_ERROR(("%s: sdio_register_driver failed\n", __FUNCTION__));
 		goto fail_1;
@@ -5336,7 +5336,7 @@ write_to_file(dhd_pub_t *dhd, uint8 *buf, int size)
 	/* open file to write */
 	fp = filp_open("/tmp/mem_dump", O_WRONLY|O_CREAT, 0640);
 	if (!fp) {
-		printf("%s: open file error\n", __FUNCTION__);
+		pr_info("%s: open file error\n", __FUNCTION__);
 		ret = -1;
 		goto exit;
 	}
@@ -5580,7 +5580,7 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 
 	i = snprintf(info_string, sizeof(info_string),
 		"  Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
-	printf("%s\n", info_string);
+        pr_info("%s\n", info_string);
 
 	if (!dhdp)
 		return;
@@ -5864,10 +5864,10 @@ static void dhd_dump_htsfhisto(histo_t *his, char *s)
 	int pktcnt = 0, curval = 0, i;
 	for (i = 0; i < (NUMBIN-2); i++) {
 		curval += 500;
-		printf("%d ",  his->bin[i]);
+		pr_info("%d ",  his->bin[i]);
 		pktcnt += his->bin[i];
 	}
-	printf(" max: %d TotPkt: %d neg: %d [%s]\n", his->bin[NUMBIN-2], pktcnt,
+	pr_info(" max: %d TotPkt: %d neg: %d [%s]\n", his->bin[NUMBIN-2], pktcnt,
 		his->bin[NUMBIN-1], s);
 }
 
@@ -5984,7 +5984,7 @@ static void dhd_dump_latency(void)
 	int i, max = 0;
 	int d1, d2, d3, d4, d5;
 
-	printf("T1       T2       T3       T4           d1  d2   t4-t1     i    \n");
+	pr_info("T1       T2       T3       T4           d1  d2   t4-t1     i    \n");
 	for (i = 0; i < TSMAX; i++) {
 		d1 = ts[i].t2 - ts[i].t1;
 		d2 = ts[i].t3 - ts[i].t2;
@@ -5994,15 +5994,15 @@ static void dhd_dump_latency(void)
 		if (d4 > d5 && d4 > 0)  {
 			max = i;
 		}
-		printf("%08X %08X %08X %08X \t%d %d %d   %d i=%d\n",
+		pr_info("%08X %08X %08X %08X \t%d %d %d   %d i=%d\n",
 			ts[i].t1, ts[i].t2, ts[i].t3, ts[i].t4,
 			d1, d2, d3, d4, i);
 	}
 
-	printf("current idx = %d \n", tsidx);
+	pr_info("current idx = %d \n", tsidx);
 
-	printf("Highest latency %d pkt no.%d total=%d\n", maxdelay, maxdelaypktno, tspktcnt);
-	printf("%08X %08X %08X %08X \t%d %d %d   %d\n",
+	pr_info("Highest latency %d pkt no.%d total=%d\n", maxdelay, maxdelaypktno, tspktcnt);
+	pr_info("%08X %08X %08X %08X \t%d %d %d   %d\n",
 	maxdelayts.t1, maxdelayts.t2, maxdelayts.t3, maxdelayts.t4,
 	maxdelayts.t2 - maxdelayts.t1,
 	maxdelayts.t3 - maxdelayts.t2,
@@ -6046,10 +6046,10 @@ dhd_ioctl_htsf_get(dhd_info_t *dhd, int ifidx)
 	s2 = dhd_get_htsf(dhd, 0);
 
 	memcpy(&tsf_buf, buf, sizeof(tsf_buf));
-	printf(" TSF_h=%04X lo=%08X Calc:htsf=%08X, coef=%d.%d%d delta=%d ",
+	pr_info(" TSF_h=%04X lo=%08X Calc:htsf=%08X, coef=%d.%d%d delta=%d ",
 		tsf_buf.high, tsf_buf.low, s2, dhd->htsf.coef, dhd->htsf.coefdec1,
 		dhd->htsf.coefdec2, s2-tsf_buf.low);
-	printf("lasttsf=%08X lastcycle=%08X\n", dhd->htsf.last_tsf, dhd->htsf.last_cycle);
+	pr_info("lasttsf=%08X lastcycle=%08X\n", dhd->htsf.last_tsf, dhd->htsf.last_cycle);
 	return 0;
 }
 
@@ -6077,7 +6077,7 @@ void htsf_update(dhd_info_t *dhd, void *data)
 	}
 
 	if (data == NULL)
-		printf(" tsf update ata point er is null \n");
+		pr_info(" tsf update ata point er is null \n");
 
 	memcpy(&prev_tsf, &cur_tsf, sizeof(tsf_t));
 	memcpy(&cur_tsf, data, sizeof(tsf_t));
