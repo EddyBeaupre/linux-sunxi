@@ -52,17 +52,17 @@
 
 #undef GMAC_DEBUG
 #ifdef GMAC_DEBUG
-#define DBG(nlevel, klevel, fmt, args...) \
-		((void)(netif_msg_##nlevel(priv) && \
-		printk(KERN_##klevel fmt, ## args)))
+#define GMAC_DBG(fmt, args...) ((void)(netif_msg_probe(priv) && pr_debug(fmt, ## args)))
+#define GMAC_INF(fmt, args...) ((void)(netif_msg_probe(priv) && pr_info(fmt, ## args)))
 #else
-#define DBG(nlevel, klevel, fmt, args...) do { } while (0)
+#define GMAC_DBG(fmt, args...) do { } while (0)
+#define GMAC_INF(fmt, args...) do { } while (0)
 #endif
 
 #undef RX_DEBUG
 /*#define RX_DEBUG*/
 #ifdef RX_DEBUG
-#define RX_DBG(fmt, args...)  printk(fmt, ## args)
+#define RX_DBG(fmt, args...)  pr_info(fmt, ## args)
 #else
 #define RX_DBG(fmt, args...)  do { } while (0)
 #endif
@@ -70,7 +70,7 @@
 #undef XMIT_DEBUG
 /*#define XMIT_DEBUG*/
 #ifdef XMIT_DEBUG
-#define TX_DBG(fmt, args...)  printk(fmt, ## args)
+#define TX_DBG(fmt, args...)  pr_info(fmt, ## args)
 #else
 #define TX_DBG(fmt, args...)  do { } while (0)
 #endif
@@ -151,13 +151,13 @@ static void gmac_exit_fs(void);
 static void print_pkt(unsigned char *buf, int len)
 {
 	int j;
-	printk("len = %d byte, buf addr: 0x%p", len, buf);
+	pr_debug("len = %d byte, buf addr: 0x%p", len, buf);
 	for (j = 0; j < len; j++) {
 		if ((j % 16) == 0)
-			printk("\n %03x:", j);
-		printk(" %02x", buf[j]);
+			pr_debug("\n %03x:", j);
+		pr_debug(" %02x", buf[j]);
 	}
-	printk("\n");
+	pr_debug("\n");
 }
 #endif
 
@@ -236,7 +236,7 @@ static void gmac_adjust_link(struct net_device *ndev)
 	if (phydev == NULL)
 		return;
 
-	DBG(probe, DEBUG, "gmac_adjust_link: called.  address %d link %d\n",
+	GMAC_DBG( "gmac_adjust_link: called.  address %d link %d\n",
 	    phydev->addr, phydev->link);
 
 	spin_lock_irqsave(&priv->lock, flags);
@@ -300,7 +300,7 @@ static void gmac_adjust_link(struct net_device *ndev)
 
 	spin_unlock_irqrestore(&priv->lock, flags);
 
-	DBG(probe, DEBUG, "gmac_adjust_link: exiting\n");
+	GMAC_DBG( "gmac_adjust_link: exiting\n");
 }
 
 /**
@@ -432,7 +432,7 @@ static void init_dma_desc_rings(struct net_device *ndev)
 		dis_ic = 1;
 #endif
 
-	DBG(probe, INFO, "gmac: txsize %d, rxsize %d, bfsize %d\n",
+	GMAC_INF( "gmac: txsize %d, rxsize %d, bfsize %d\n",
 	    txsize, rxsize, bfsize);
 
 	priv->rx_skbuff_dma = kmalloc(rxsize * sizeof(dma_addr_t), GFP_KERNEL);
@@ -456,13 +456,13 @@ static void init_dma_desc_rings(struct net_device *ndev)
 		return;
 	}
 
-	DBG(probe, INFO, "gmac (%s) DMA desc: virt addr (Rx %p, "
+	GMAC_INF( "gmac (%s) DMA desc: virt addr (Rx %p, "
 	    "Tx %p)\n\tDMA phy addr (Rx 0x%08x, Tx 0x%08x)\n",
 	    ndev->name, priv->dma_rx, priv->dma_tx,
 	    (unsigned int)priv->dma_rx_phy, (unsigned int)priv->dma_tx_phy);
 
 	/* RX INITIALIZATION */
-	DBG(probe, INFO, "gmac: SKB addresses:\n"
+	GMAC_INF( "gmac: SKB addresses:\n"
 			 "skb\t\tskb data\tdma data\n");
 
 	for (i = 0; i < rxsize; i++) {
@@ -483,7 +483,7 @@ static void init_dma_desc_rings(struct net_device *ndev)
 
 		gmac_init_desc3(des3_as_data_buf, p);
 
-		DBG(probe, INFO, "[%p]\t[%p]\t[%x]\n", priv->rx_skbuff[i],
+		GMAC_INF( "[%p]\t[%p]\t[%x]\n", priv->rx_skbuff[i],
 			priv->rx_skbuff[i]->data, priv->rx_skbuff_dma[i]);
 	}
 	priv->cur_rx = 0;
@@ -510,9 +510,9 @@ static void init_dma_desc_rings(struct net_device *ndev)
 	desc_init_tx(priv->dma_tx, txsize);
 
 	if (netif_msg_hw(priv)) {
-		printk("RX descriptor ring:\n");
+		pr_debug("RX descriptor ring:\n");
 		display_ring(priv->dma_rx, rxsize);
-		printk("TX descriptor ring:\n");
+		pr_debug("TX descriptor ring:\n");
 		display_ring(priv->dma_tx, txsize);
 	}
 }
@@ -786,7 +786,7 @@ static void gmac_check_ether_addr(struct gmac_priv *priv)
 		if  (!is_valid_ether_addr(priv->ndev->dev_addr))
 			random_ether_addr(priv->ndev->dev_addr);
 	}
-	printk(KERN_WARNING "%s: device MAC address %pM\n", priv->ndev->name,
+	pr_warn( "%s: device MAC address %pM\n", priv->ndev->name,
 						   priv->ndev->dev_addr);
 }
 
@@ -866,7 +866,7 @@ static int gmac_open(struct net_device *ndev)
 		pr_warning("%s: failed debugFS registration\n", __func__);
 #endif
 	/* Start the ball rolling... */
-	DBG(probe, DEBUG, "%s: DMA RX/TX processes started...\n", ndev->name);
+	GMAC_DBG( "%s: DMA RX/TX processes started...\n", ndev->name);
 	dma_start_tx(priv->ioaddr);
 	dma_start_rx(priv->ioaddr);
 
@@ -1097,7 +1097,7 @@ static inline void gmac_rx_refill(struct gmac_priv *priv)
 
 				gmac_refill_desc3(bfsize, p + entry);
 
-			RX_DBG(KERN_INFO "\trefill entry #%d\n", entry);
+			RX_DBG("\trefill entry #%d\n", entry);
 		}
 		wmb();
 		desc_set_rx_own(p + entry);
@@ -1250,13 +1250,13 @@ static int gmac_config(struct net_device *ndev, struct ifmap *map)
 
 	/* Don't allow changing the I/O address */
 	if (map->base_addr != ndev->base_addr) {
-		printk(KERN_WARNING "%s: can't change I/O address\n", ndev->name);
+		pr_warn( "%s: can't change I/O address\n", ndev->name);
 		return -EOPNOTSUPP;
 	}
 
 	/* Don't allow changing the IRQ */
 	if (map->irq != ndev->irq) {
-		printk(KERN_WARNING "%s: can't change IRQ number %d\n",
+		pr_warn( "%s: can't change IRQ number %d\n",
 		       ndev->name, ndev->irq);
 		return -EOPNOTSUPP;
 	}
@@ -1405,29 +1405,29 @@ static int gmac_sysfs_ring_read(struct seq_file *seq, void *v)
 	struct net_device *dev = seq->private;
 	struct gmac_priv *priv = netdev_priv(dev);
 
-	seq_printk(seq, "=======================\n");
-	seq_printk(seq, " RX descriptor ring\n");
-	seq_printk(seq, "=======================\n");
+	seq_printf(seq, "=======================\n");
+	seq_printf(seq, " RX descriptor ring\n");
+	seq_printf(seq, "=======================\n");
 
 	for (i = 0; i < priv->dma_rx_size; i++) {
 		struct tmp_s *x = (struct tmp_s *)(priv->dma_rx + i);
-		seq_printk(seq, "[%d] DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
+		seq_printf(seq, "[%d] DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
 			   i, (unsigned int)(x->a),
 			   (unsigned int)((x->a) >> 32), x->b, x->c);
-		seq_printk(seq, "\n");
+		seq_printf(seq, "\n");
 	}
 
-	seq_printk(seq, "\n");
-	seq_printk(seq, "=======================\n");
-	seq_printk(seq, "  TX descriptor ring\n");
-	seq_printk(seq, "=======================\n");
+	seq_printf(seq, "\n");
+	seq_printf(seq, "=======================\n");
+	seq_printf(seq, "  TX descriptor ring\n");
+	seq_printf(seq, "=======================\n");
 
 	for (i = 0; i < priv->dma_tx_size; i++) {
 		struct tmp_s *x = (struct tmp_s *)(priv->dma_tx + i);
-		seq_printk(seq, "[%d] DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
+		seq_printf(seq, "[%d] DES0=0x%x DES1=0x%x BUF1=0x%x BUF2=0x%x",
 			   i, (unsigned int)(x->a),
 			   (unsigned int)((x->a) >> 32), x->b, x->c);
-		seq_printk(seq, "\n");
+		seq_printf(seq, "\n");
 	}
 
 	return 0;
@@ -1530,7 +1530,7 @@ struct gmac_priv *gmac_dvr_probe(struct device *device,
 
 	ndev = alloc_etherdev(sizeof(struct gmac_priv));
 	if (!ndev) {
-		printk(KERN_ERR "ERROR: Allocating netdevice is failed!\n");
+		pr_err( "ERROR: Allocating netdevice is failed!\n");
 		return NULL;
 	}
 
@@ -1575,7 +1575,7 @@ struct gmac_priv *gmac_dvr_probe(struct device *device,
 	gmac_check_ether_addr(priv);
 	ret = register_netdev(ndev);
 	if (ret) {
-		printk(KERN_ERR "ERROR: %i registering the device\n", ret);
+		pr_err( "ERROR: %i registering the device\n", ret);
 		goto error;
 	}
 
@@ -1708,10 +1708,10 @@ static int __init gmac_init(void)
 {
 #ifdef CONFIG_GMAC_SCRIPT_SYS
 	if (SCRIPT_PARSER_OK != script_parser_fetch("gmac_para", "gmac_used", &gmac_used, 1))
-		printk(KERN_WARNING "emac_init fetch emac using configuration failed\n");
+		pr_warn( "emac_init fetch emac using configuration failed\n");
 
 	if (!gmac_used) {
-		printk(KERN_INFO "gmac driver is disabled\n");
+		pr_info( "gmac driver is disabled\n");
 		return 0;
 	}
 #endif

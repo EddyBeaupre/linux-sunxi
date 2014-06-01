@@ -139,7 +139,7 @@ int gmac_mdio_register(struct net_device *ndev)
 	new_bus->parent = priv->device;
 	err = mdiobus_register(new_bus);
 	if (err != 0) {
-		printk(KERN_ERR "%s: Cannot register as MDIO bus\n", new_bus->name);
+		pr_err( "%s: Cannot register as MDIO bus\n", new_bus->name);
 		goto bus_register_fail;
 	}
 
@@ -195,7 +195,7 @@ int gmac_mdio_register(struct net_device *ndev)
 	}
 
 	if (!found){
-		printk(KERN_WARNING "%s: No PHY found\n", ndev->name);
+		pr_warn( "%s: No PHY found\n", ndev->name);
 		err = -ENXIO;
 		goto out_err;
 	}
