@@ -31,22 +31,23 @@
 
 #if defined(DHD_DEBUG)
 
-#define DHD_ERROR(args)		do {if ((dhd_msg_level & DHD_ERROR_VAL) && USE_NET_RATELIMIT) \
-								pr_info args;} while (0)
-#define DHD_TRACE(args)		do {if (dhd_msg_level & DHD_TRACE_VAL) pr_info args;} while (0)
-#define DHD_INFO(args)		do {if (dhd_msg_level & DHD_INFO_VAL) pr_info args;} while (0)
-#define DHD_DATA(args)		do {if (dhd_msg_level & DHD_DATA_VAL) pr_info args;} while (0)
-#define DHD_CTL(args)		do {if (dhd_msg_level & DHD_CTL_VAL) pr_info args;} while (0)
-#define DHD_TIMER(args)		do {if (dhd_msg_level & DHD_TIMER_VAL) pr_info args;} while (0)
-#define DHD_HDRS(args)		do {if (dhd_msg_level & DHD_HDRS_VAL) pr_info args;} while (0)
-#define DHD_BYTES(args)		do {if (dhd_msg_level & DHD_BYTES_VAL) pr_info args;} while (0)
-#define DHD_INTR(args)		do {if (dhd_msg_level & DHD_INTR_VAL) pr_info args;} while (0)
-#define DHD_GLOM(args)		do {if (dhd_msg_level & DHD_GLOM_VAL) pr_info args;} while (0)
-#define DHD_EVENT(args)		do {if (dhd_msg_level & DHD_EVENT_VAL) pr_info args;} while (0)
-#define DHD_BTA(args)		do {if (dhd_msg_level & DHD_BTA_VAL) pr_info args;} while (0)
-#define DHD_ISCAN(args)		do {if (dhd_msg_level & DHD_ISCAN_VAL) pr_info args;} while (0)
-#define DHD_ARPOE(args)		do {if (dhd_msg_level & DHD_ARPOE_VAL) pr_info args;} while (0)
-#define DHD_REORDER(args)	do {if (dhd_msg_level & DHD_REORDER_VAL) pr_info args;} while (0)
+#define DHD_ERROR(...)		do {if ((dhd_msg_level & DHD_ERROR_VAL) && USE_NET_RATELIMIT) \
+								AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_TRACE(...)		do {if (dhd_msg_level & DHD_TRACE_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_INFO(...)		do {if (dhd_msg_level & DHD_INFO_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_DATA(...)		do {if (dhd_msg_level & DHD_DATA_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_CTL(...)		do {if (dhd_msg_level & DHD_CTL_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_TIMER(...)		do {if (dhd_msg_level & DHD_TIMER_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_HDRS(...)		do {if (dhd_msg_level & DHD_HDRS_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_BYTES(...)		do {if (dhd_msg_level & DHD_BYTES_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_INTR(...)		do {if (dhd_msg_level & DHD_INTR_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_GLOM(...)		do {if (dhd_msg_level & DHD_GLOM_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_EVENT(...)		do {if (dhd_msg_level & DHD_EVENT_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_BTA(...)		do {if (dhd_msg_level & DHD_BTA_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_ISCAN(...)		do {if (dhd_msg_level & DHD_ISCAN_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_ARPOE(...)		do {if (dhd_msg_level & DHD_ARPOE_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_REORDER(...)	do {if (dhd_msg_level & DHD_REORDER_VAL) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_CONT(...)		do {if (dhd_msg_level & DHD_REORDER_VAL) AP6210_CONT(__VA_ARGS__);} while (0)
 
 #define DHD_TRACE_HW4	DHD_TRACE
 
@@ -68,21 +69,21 @@
 
 #else /* defined(BCMDBG) || defined(DHD_DEBUG) */
 
-#define DHD_ERROR(args)		do {if (USE_NET_RATELIMIT) pr_info args;} while (0)
-#define DHD_TRACE(args)
-#define DHD_INFO(args)
-#define DHD_DATA(args)
-#define DHD_CTL(args)
-#define DHD_TIMER(args)
-#define DHD_HDRS(args)
-#define DHD_BYTES(args)
-#define DHD_INTR(args)
-#define DHD_GLOM(args)
-#define DHD_EVENT(args)
-#define DHD_BTA(args)
-#define DHD_ISCAN(args)
-#define DHD_ARPOE(args)
-#define DHD_REORDER(args)
+#define DHD_ERROR(...)		do {if (USE_NET_RATELIMIT) AP6210_INFO(__VA_ARGS__);} while (0)
+#define DHD_TRACE(...)
+#define DHD_INFO(...)
+#define DHD_DATA(...)
+#define DHD_CTL(...)
+#define DHD_TIMER(...)
+#define DHD_HDRS(...)
+#define DHD_BYTES(...)
+#define DHD_INTR(...)
+#define DHD_GLOM(...)
+#define DHD_EVENT(...)
+#define DHD_BTA(...)
+#define DHD_ISCAN(...)
+#define DHD_ARPOE(...)
+#define DHD_REORDER(...)
 
 #define DHD_TRACE_HW4	DHD_TRACE
 

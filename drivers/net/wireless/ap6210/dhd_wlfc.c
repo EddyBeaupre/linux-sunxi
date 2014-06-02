@@ -738,8 +738,8 @@ _dhd_wlfc_send_signalonly_packet(athost_wl_status_info_t* ctx, wlfc_mac_descript
 		}
 	}
 	else {
-		DHD_ERROR(("%s: couldn't allocate new %d-byte packet\n",
-		           __FUNCTION__, dummylen));
+		DHD_ERROR("%s: couldn't allocate new %d-byte packet\n",
+		           __FUNCTION__, dummylen);
 		rc = BCME_NOMEM;
 	}
 	return rc;
@@ -1364,8 +1364,8 @@ dhd_wlfc_commit_packets(void* state, f_commitpkt_t fcommit, void* commit_ctx, vo
 				} else {
 					bus_retry_count++;
 					if (bus_retry_count >= BUS_RETRIES) {
-						DHD_ERROR((" %s: bus error %d\n",
-							__FUNCTION__, rc));
+						DHD_ERROR(" %s: bus error %d\n",
+							__FUNCTION__, rc);
 						return rc;
 					}
 				}
@@ -1414,7 +1414,7 @@ dhd_wlfc_commit_packets(void* state, f_commitpkt_t fcommit, void* commit_ctx, vo
 			else {
 				bus_retry_count++;
 				if (bus_retry_count >= BUS_RETRIES) {
-					DHD_ERROR(("%s: bus error %d\n", __FUNCTION__, rc));
+					DHD_ERROR("%s: bus error %d\n", __FUNCTION__, rc);
 					ctx->FIFO_credit[ac] -= credit;
 					return rc;
 				}
@@ -1498,7 +1498,7 @@ dhd_wlfc_commit_packets(void* state, f_commitpkt_t fcommit, void* commit_ctx, vo
 		else {
 			bus_retry_count++;
 			if (bus_retry_count >= BUS_RETRIES) {
-				DHD_ERROR(("%s: bus error %d\n", __FUNCTION__, rc));
+				DHD_ERROR("%s: bus error %d\n", __FUNCTION__, rc);
 				return rc;
 			}
 		}
@@ -1960,7 +1960,7 @@ dhd_wlfc_dbg_senum_check(dhd_pub_t *dhd, uint8 *value)
 	(void)dhd;
 
 	bcopy(&value[2], &timestamp, sizeof(uint32));
-	DHD_INFO(("RXPKT: SEQ: %d, timestamp %d\n", value[1], timestamp));
+	DHD_INFO("RXPKT: SEQ: %d, timestamp %d\n", value[1], timestamp);
 	return BCME_OK;
 }
 
@@ -2269,15 +2269,15 @@ dhd_wlfc_init(dhd_pub_t *dhd)
 	/* enable proptxtstatus signaling by default */
 	bcm_mkiovar("tlv", (char *)&tlv, 4, iovbuf, sizeof(iovbuf));
 	if (dhd_wl_ioctl_cmd(dhd, WLC_SET_VAR, iovbuf, sizeof(iovbuf), TRUE, 0) < 0) {
-		DHD_ERROR(("dhd_wlfc_init(): failed to enable/disable bdcv2 tlv signaling\n"));
+		DHD_ERROR("dhd_wlfc_init(): failed to enable/disable bdcv2 tlv signaling\n");
 	}
 	else {
 		/*
 		Leaving the message for now, it should be removed after a while; once
 		the tlv situation is stable.
 		*/
-		DHD_ERROR(("dhd_wlfc_init(): successfully %s bdcv2 tlv signaling, %d\n",
-			dhd->wlfc_enabled?"enabled":"disabled", tlv));
+		DHD_ERROR("dhd_wlfc_init(): successfully %s bdcv2 tlv signaling, %d\n",
+			dhd->wlfc_enabled?"enabled":"disabled", tlv);
 	}
 	return BCME_OK;
 }
@@ -2309,7 +2309,7 @@ dhd_wlfc_enable(dhd_pub_t *dhd)
 	if (wlfc->hanger == NULL) {
 		MFREE(dhd->osh, dhd->wlfc_state, sizeof(athost_wl_status_info_t));
 		dhd->wlfc_state = NULL;
-		DHD_ERROR(("Failed to malloc dhd->wlfc_state\n"));
+		DHD_ERROR("Failed to malloc dhd->wlfc_state\n");
 		return BCME_NOMEM;
 	}
 

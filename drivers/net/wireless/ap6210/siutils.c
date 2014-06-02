@@ -47,6 +47,8 @@
 
 #include "siutils_priv.h"
 
+#include <ap6210.h>
+
 /* local prototypes */
 static si_info_t *si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
                               uint bustype, void *sdh, char **vars, uint *varsz);
@@ -80,7 +82,7 @@ si_attach(uint devid, osl_t *osh, void *regs,
 
 	/* alloc si_info_t */
 	if ((sii = MALLOC(osh, sizeof (si_info_t))) == NULL) {
-		SI_ERROR(("si_attach: malloc failed! malloced %d bytes\n", MALLOCED(osh)));
+		SI_ERROR("si_attach: malloc failed! malloced %d bytes\n", MALLOCED(osh));
 		return (NULL);
 	}
 
@@ -113,7 +115,7 @@ si_kattach(osl_t *osh)
 		                SI_BUS, NULL,
 		                osh != SI_OSH ? &ksii.vars : NULL,
 		                osh != SI_OSH ? &ksii.varsz : NULL) == NULL) {
-			SI_ERROR(("si_kattach: si_doattach failed\n"));
+			SI_ERROR("si_kattach: si_doattach failed\n");
 			REG_UNMAP(regs);
 			return NULL;
 		}
@@ -161,8 +163,8 @@ si_buscore_prep(si_info_t *sii, uint bustype, uint devid, void *sdh)
 					SBSDIO_FUNC1_CHIPCLKCSR, NULL)), !SBSDIO_ALPAV(clkval)),
 					PMU_MAX_TRANSITION_DLY);
 				if (!SBSDIO_ALPAV(clkval)) {
-					SI_ERROR(("timeout on ALPAV wait, clkval 0x%02x\n",
-						clkval));
+					SI_ERROR("timeout on ALPAV wait, clkval 0x%02x\n",
+						clkval);
 					return FALSE;
 				}
 				clkset = SBSDIO_FORCE_HW_CLKREQ_OFF | SBSDIO_FORCE_ALP;
@@ -348,14 +350,14 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 
 	sih->bustype = bustype;
 	if (bustype != BUSTYPE(bustype)) {
-		SI_ERROR(("si_doattach: bus type %d does not match configured bus type %d\n",
-			bustype, BUSTYPE(bustype)));
+		SI_ERROR("si_doattach: bus type %d does not match configured bus type %d\n",
+			bustype, BUSTYPE(bustype));
 		return NULL;
 	}
 
 	/* bus/core/clk setup for register access */
 	if (!si_buscore_prep(sii, bustype, devid, sdh)) {
-		SI_ERROR(("si_doattach: si_core_clk_prep failed %d\n", bustype));
+		SI_ERROR("si_doattach: si_core_clk_prep failed %d\n", bustype);
 		return NULL;
 	}
 
@@ -365,7 +367,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 	 *   some way of recognizing them needs to be added here.
 	 */
 	if (!cc) {
-		SI_ERROR(("%s: chipcommon register space is null \n", __FUNCTION__));
+		SI_ERROR("%s: chipcommon register space is null \n", __FUNCTION__);
 		return NULL;
 	}
 	w = R_REG(osh, &cc->chipid);
@@ -398,25 +400,25 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 		/* pass chipc address instead of original core base */
 		ub_scan(&sii->pub, (void *)(uintptr)cc, devid);
 	} else {
-		SI_ERROR(("Found chip of unknown type (0x%08x)\n", w));
+		SI_ERROR("Found chip of unknown type (0x%08x)\n", w);
 		return NULL;
 	}
 	/* no cores found, bail out */
 	if (sii->numcores == 0) {
-		SI_ERROR(("si_doattach: could not find any cores\n"));
+		SI_ERROR("si_doattach: could not find any cores\n");
 		return NULL;
 	}
 	/* bus/core/clk setup */
 	origidx = SI_CC_IDX;
 	if (!si_buscore_setup(sii, cc, bustype, savewin, &origidx, regs)) {
-		SI_ERROR(("si_doattach: si_buscore_setup failed\n"));
+		SI_ERROR("si_doattach: si_buscore_setup failed\n");
 		goto exit;
 	}
 
 	if (CHIPID(sih->chip) == BCM4322_CHIP_ID && (((sih->chipst & CST4322_SPROM_OTP_SEL_MASK)
 		>> CST4322_SPROM_OTP_SEL_SHIFT) == (CST4322_OTP_PRESENT |
 		CST4322_SPROM_PRESENT))) {
-		SI_ERROR(("%s: Invalid setting: both SPROM and OTP strapped.\n", __FUNCTION__));
+		SI_ERROR("%s: Invalid setting: both SPROM and OTP strapped.\n", __FUNCTION__);
 		return NULL;
 	}
 
@@ -433,7 +435,7 @@ si_doattach(si_info_t *sii, uint devid, osl_t *osh, void *regs,
 			/* otp_clk_div is even number, 120/14 < 9mhz */
 			clkdiv = (clkdiv & ~CLKD_OTP) | (14 << CLKD_OTP_SHIFT);
 			W_REG(osh, &cc->clkdiv, clkdiv);
-			SI_ERROR(("%s: set clkdiv to %x\n", __FUNCTION__, clkdiv));
+			SI_ERROR("%s: set clkdiv to %x\n", __FUNCTION__, clkdiv);
 		}
 		OSL_DELAY(10);
 	}
@@ -519,7 +521,7 @@ si_setosh(si_t *sih, osl_t *osh)
 
 	sii = SI_INFO(sih);
 	if (sii->osh != NULL) {
-		SI_ERROR(("osh is already set....\n"));
+		SI_ERROR("osh is already set....\n");
 		ASSERT(!sii->osh);
 	}
 	sii->osh = osh;

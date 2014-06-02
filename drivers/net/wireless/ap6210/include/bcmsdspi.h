@@ -28,19 +28,16 @@
 
 /* global msglevel for debug messages - bitvals come from sdiovar.h */
 
-#define sd_err(x) pr_err x
-#define sd_trace(x) pr_debug x
-#define sd_info(x) pr_info x
-#define sd_debug(x) pr_debug x
-#define sd_data(x) pr_debug x
-#define sd_ctrl(x) pr_debug x
+#define sd_err(...)	AP6210_ERR(__VA_ARGS__)
+#define sd_trace(...)	AP6210_DEBUG(__VA_ARGS__)
+#define sd_info(...)	AP6210_INFO(__VA_ARGS__)
+#define sd_debug(...)	AP6210_DEBUG(__VA_ARGS__)
+#define sd_data(...)	AP6210_DEBUG(__VA_ARGS__)
+#define sd_ctrl(...)	AP6210_DEBUG(__VA_ARGS__)
 
 #define sd_log(x)
 
-#define SDIOH_ASSERT(exp) \
-	do { if (!(exp)) \
-		pr_info("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); \
-	} while (0)
+#define SDIOH_ASSERT(exp) do { if (!(exp)) AP6210_INFO("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); } while (0)
 
 #define BLOCK_SIZE_4318 64
 #define BLOCK_SIZE_4328 512

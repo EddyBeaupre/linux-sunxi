@@ -27,13 +27,13 @@
 #define	_BCM_SD_STD_H
 
 /* global msglevel for debug messages - bitvals come from sdiovar.h */
-#define sd_err(x)	do { if (sd_msglevel & SDH_ERROR_VAL) pr_err x; } while (0)
-#define sd_trace(x)	do { if (sd_msglevel & SDH_ERROR_TRACE) pr_debug x; } while (0)
-#define sd_info(x)	do { if (sd_msglevel & SDH_ERROR_INFO) pr_info x; } while (0)
-#define sd_debug(x)	do { if (sd_msglevel & SDH_ERROR_DEBUG) pr_debug x; } while (0)
-#define sd_data(x)	do { if (sd_msglevel & SDH_ERROR_DATA) pr_debug x; } while (0)
-#define sd_ctrl(x)	do { if (sd_msglevel & SDH_ERROR_CTRL) pr_debug x; } while (0)
-#define sd_dma(x)	do { if (sd_msglevel & SDH_ERROR_DMA) pr_debug x; } while (0)
+#define sd_err(...)	do { if (sd_msglevel & SDH_ERROR_VAL) AP6210_ERR(__VA_ARGS__); } while (0)
+#define sd_trace(...)	do { if (sd_msglevel & SDH_ERROR_TRACE) AP6210_DEBUG(__VA_ARGS__); } while (0)
+#define sd_info(...)	do { if (sd_msglevel & SDH_ERROR_INFO) AP6210_INFO(__VA_ARGS__); } while (0)
+#define sd_debug(...)	do { if (sd_msglevel & SDH_ERROR_DEBUG) AP6210_DEBUG(__VA_ARGS__); } while (0)
+#define sd_data(...)	do { if (sd_msglevel & SDH_ERROR_DATA) AP6210_DEBUG(__VA_ARGS__); } while (0)
+#define sd_ctrl(...)	do { if (sd_msglevel & SDH_ERROR_CTRL) AP6210_DEBUG(__VA_ARGS__); } while (0)
+#define sd_dma(...)	do { if (sd_msglevel & SDH_ERROR_DMA) AP6210_DEBUG(__VA_ARGS__); } while (0)
 
 #define sd_sync_dma(sd, read, nbytes)
 #define sd_init_dma(sd)
@@ -45,10 +45,7 @@ extern void sdstd_osfree(sdioh_info_t *sd);
 
 #define sd_log(x)
 
-#define SDIOH_ASSERT(exp) \
-	do { if (!(exp)) \
-		pr_info("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); \
-	} while (0)
+#define SDIOH_ASSERT(exp) do { if (!(exp)) AP6210_INFO("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); } while (0)
 
 #define BLOCK_SIZE_4318 64
 #define BLOCK_SIZE_4328 512

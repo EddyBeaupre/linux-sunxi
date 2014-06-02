@@ -60,6 +60,8 @@
 #include <wl_cfgp2p.h>
 #include <wl_android.h>
 
+#include <ap6210.h>
+
 #ifdef PROP_TXSTATUS
 #include <dhd_wlfc.h>
 #endif
@@ -3759,7 +3761,7 @@ wl_update_pmklist(struct net_device *dev, struct wl_pmk_list *pmk_list,
 	struct net_device *primary_dev = wl_to_prmry_ndev(wl);
 
 	if (!pmk_list) {
-		pr_debug("pmk_list is NULL\n");
+		AP6210_DEBUG("pmk_list is NULL\n");
 		return -EINVAL;
 	}
 	/* pmk list is supported only for STA interface i.e. primary interface
@@ -6595,13 +6597,13 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 			wl_link_up(wl);
 			act = true;
 			if (wl_is_ibssmode(wl, ndev)) {
-				pr_debug("cfg80211_ibss_joined\n");
+				AP6210_DEBUG("cfg80211_ibss_joined\n");
 				cfg80211_ibss_joined(ndev, (s8 *)&e->addr,
 					GFP_KERNEL);
 				WL_DBG(("joined in IBSS network\n"));
 			} else {
 				if (!wl_get_drv_status(wl, DISCONNECTING, ndev)) {
-					pr_debug("wl_bss_connect_done succeeded with " MACDBG "\n",
+					AP6210_DEBUG("wl_bss_connect_done succeeded with " MACDBG "\n",
 						MAC2STRDBG((u8*)(&e->addr)));
 					wl_bss_connect_done(wl, ndev, e, data, true);
 					WL_DBG(("joined in BSS network \"%s\"\n",
@@ -6630,7 +6632,7 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 				/* WLAN_REASON_UNSPECIFIED is used for hang up event in Android */
 				reason = (reason == WLAN_REASON_UNSPECIFIED)? 0 : reason;
 
-				pr_debug("link down if %s may call cfg80211_disconnected. "
+				AP6210_DEBUG("link down if %s may call cfg80211_disconnected. "
 					"event : %d, reason=%d from " MACDBG "\n",
 					ndev->name, event, ntoh32(e->reason),
 					MAC2STRDBG((u8*)(&e->addr)));
@@ -6661,7 +6663,7 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 				}
 			}
 			else if (wl_get_drv_status(wl, CONNECTING, ndev)) {
-				pr_debug("link down, during connecting\n");
+				AP6210_DEBUG("link down, during connecting\n");
 #ifdef ESCAN_RESULT_PATCH
 				if ((memcmp(connect_req_bssid, broad_bssid, ETHER_ADDR_LEN) == 0) ||
 					(memcmp(&e->addr, broad_bssid, ETHER_ADDR_LEN) == 0) ||
@@ -6677,7 +6679,7 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 				complete(&wl->iface_disable);
 
 		} else if (wl_is_nonetwork(wl, e)) {
-			pr_debug("connect failed event=%d e->status %d e->reason %d \n",
+			AP6210_DEBUG("connect failed event=%d e->status %d e->reason %d \n",
 				event, (int)ntoh32(e->status), (int)ntoh32(e->reason));
 			/* Clean up any pending scan request */
 			if (wl->scan_request) {
@@ -6691,7 +6693,7 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 			if (wl_get_drv_status(wl, CONNECTING, ndev))
 				wl_bss_connect_done(wl, ndev, e, data, false);
 		} else {
-			pr_debug("%s nothing\n", __FUNCTION__);
+			AP6210_DEBUG("%s nothing\n", __FUNCTION__);
 		}
 	}
 	return err;
@@ -6921,7 +6923,7 @@ wl_bss_roaming_done(struct wl_priv *wl, struct net_device *ndev,
 	curbssid = wl_read_prof(wl, ndev, WL_PROF_BSSID);
 	wl_update_bss_info(wl, ndev, 1);
 	wl_update_pmklist(ndev, wl->pmk_list, err);
-	pr_debug("wl_bss_roaming_done succeeded to " MACDBG "\n",
+	AP6210_DEBUG("wl_bss_roaming_done succeeded to " MACDBG "\n",
 		MAC2STRDBG((u8*)(&e->addr)));
 
 	cfg80211_roamed(ndev,
@@ -9921,7 +9923,7 @@ int wl_cfg80211_do_driver_init(struct net_device *net)
 void wl_cfg80211_enable_trace(u32 level)
 {
 	wl_dbg_level = level;
-	pr_debug("%s: wl_dbg_level = 0x%x\n", __FUNCTION__, wl_dbg_level);
+	AP6210_DEBUG("%s: wl_dbg_level = 0x%x\n", __FUNCTION__, wl_dbg_level);
 }
 
 #if defined(WL_SUPPORT_BACKPORTED_KPATCHES) || (LINUX_VERSION_CODE >= KERNEL_VERSION(3, \

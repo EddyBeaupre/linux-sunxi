@@ -40,6 +40,8 @@
 #include <dngl_stats.h>
 #include <dhd.h>
 
+#include <ap6210.h>
+
 typedef enum monitor_states
 {
 	MONITOR_STATE_DEINIT = 0x0,
@@ -59,7 +61,7 @@ int dhd_monitor_uninit(void);
 #ifndef DHD_MAX_IFS
 #define DHD_MAX_IFS 16
 #endif
-#define MON_PRINT(format, ...) pr_debug("DHD-MON: %s " format, __func__, ##__VA_ARGS__)
+#define MON_PRINT(format, ...) AP6210_DEBUG("DHD-MON: %s " format, __func__, ##__VA_ARGS__)
 #define MON_TRACE MON_PRINT
 
 typedef struct monitor_interface {

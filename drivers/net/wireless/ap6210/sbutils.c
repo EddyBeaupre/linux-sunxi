@@ -39,6 +39,8 @@
 
 #include "siutils_priv.h"
 
+#include <ap6210.h>
+
 
 /* local prototypes */
 static uint _sb_coreidx(si_info_t *sii, uint32 sba);
@@ -480,7 +482,7 @@ _sb_scan(si_info_t *sii, uint32 sba, void *regs, uint bus, uint32 sbba, uint num
 	uint i;
 
 	if (bus >= SB_MAXBUSES) {
-		SI_ERROR(("_sb_scan: bus 0x%08x at level %d is too deep to scan\n", sbba, bus));
+		SI_ERROR("_sb_scan: bus 0x%08x at level %d is too deep to scan\n", sbba, bus);
 		return 0;
 	}
 	SI_MSG(("_sb_scan: scan bus 0x%08x assume %u cores\n", sbba, numcores));
@@ -524,8 +526,8 @@ _sb_scan(si_info_t *sii, uint32 sba, void *regs, uint bus, uint32 sbba, uint num
 				else if (chip == BCM5365_CHIP_ID)
 					numcores = 7;
 				else {
-					SI_ERROR(("sb_chip2numcores: unsupported chip 0x%x\n",
-					          chip));
+					SI_ERROR("sb_chip2numcores: unsupported chip 0x%x\n",
+					          chip);
 					ASSERT(0);
 					numcores = 1;
 				}
@@ -692,7 +694,7 @@ sb_admatch(si_info_t *sii, uint asidx)
 		break;
 
 	default:
-		SI_ERROR(("%s: Address space index (%d) out of range\n", __FUNCTION__, asidx));
+		SI_ERROR("%s: Address space index (%d) out of range\n", __FUNCTION__, asidx);
 		return 0;
 	}
 
@@ -794,7 +796,7 @@ sb_core_disable(si_t *sih, uint32 bits)
 	OSL_DELAY(1);
 	SPINWAIT((R_SBREG(sii, &sb->sbtmstatehigh) & SBTMH_BUSY), 100000);
 	if (R_SBREG(sii, &sb->sbtmstatehigh) & SBTMH_BUSY)
-		SI_ERROR(("%s: target state still busy\n", __FUNCTION__));
+		SI_ERROR("%s: target state still busy\n", __FUNCTION__);
 
 	if (R_SBREG(sii, &sb->sbidlow) & SBIDL_INIT) {
 		OR_SBREG(sii, &sb->sbimstate, SBIM_RJ);

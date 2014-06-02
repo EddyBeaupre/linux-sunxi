@@ -54,6 +54,8 @@
 #include <proto/802.11.h>
 void *_bcmutils_dummy_fn = NULL;
 
+#include <ap6210.h>
+
 
 #ifdef BCMDRIVER
 
@@ -1053,7 +1055,7 @@ prpkt(const char *msg, osl_t *osh, void *p0)
 	void *p;
 
 	if (msg && (msg[0] != '\0'))
-		pr_info("%s:\n", msg);
+		AP6210_INFO("%s:\n", msg);
 
 	for (p = p0; p; p = PKTNEXT(osh, p))
 		prhex(NULL, PKTDATA(osh, p), PKTLEN(osh, p));
@@ -1660,7 +1662,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 	uint i;
 
 	if (msg && (msg[0] != '\0'))
-		pr_info("%s:\n", msg);
+		AP6210_INFO("%s:\n", msg);
 
 	p = line;
 	for (i = 0; i < nbytes; i++) {
@@ -1676,7 +1678,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 		}
 
 		if (i % 16 == 15) {
-			pr_info("%s\n", line);		/* flush line */
+			AP6210_INFO("%s\n", line);		/* flush line */
 			p = line;
 			len = sizeof(line);
 		}
@@ -1684,7 +1686,7 @@ prhex(const char *msg, uchar *buf, uint nbytes)
 
 	/* flush last partial line */
 	if (p != line)
-		pr_info("%s\n", line);
+		AP6210_INFO("%s\n", line);
 }
 
 static const char *crypto_algo_names[] = {
@@ -1993,7 +1995,7 @@ bcm_print_bytes(const char *name, const uchar *data, int len)
 	int i;
 	int per_line = 0;
 
-	pr_info("%s: %d \n", name ? name : "", len);
+	AP6210_INFO("%s: %d \n", name ? name : "", len);
 	for (i = 0; i < len; i++) {
 		pr_info("%02x ", *data++);
 		per_line++;

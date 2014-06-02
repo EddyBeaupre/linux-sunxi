@@ -37,9 +37,9 @@ extern uint32 wl_msg_level2;
 
 #if 0 && (VERSION_MAJOR > 9)
 #include <IOKit/apple80211/IO8Log.h>
-#define WL_PRINT(args)		do { pr_info args; IO8Log args; } while (0)
+#define WL_PRINT(...)		do { AP6210_INFO(__VA_ARGS__); IO8Log __VA_ARGS__; } while (0)
 #else
-#define WL_PRINT(args)		do { WL_TIMESTAMP(); pr_info args; } while (0)
+#define WL_PRINT(...)		do { WL_TIMESTAMP(); AP6210_INFO(__VA_ARGS__); } while (0)
 #endif
 
 
