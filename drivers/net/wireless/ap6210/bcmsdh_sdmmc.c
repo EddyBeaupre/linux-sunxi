@@ -101,18 +101,18 @@ sdioh_sdmmc_card_enablefuncs(sdioh_info_t *sd)
 	/* Get the Card's common CIS address */
 	sd->com_cis_ptr = sdioh_sdmmc_get_cisaddr(sd, SDIOD_CCCR_CISPTR_0);
 	sd->func_cis_ptr[0] = sd->com_cis_ptr;
-	sd_info("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
+	sd_debug("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
 
 	/* Get the Card's function CIS (for each function) */
 	for (fbraddr = SDIOD_FBR_STARTADDR, func = 1;
 	     func <= sd->num_funcs; func++, fbraddr += SDIOD_FBR_SIZE) {
 		sd->func_cis_ptr[func] = sdioh_sdmmc_get_cisaddr(sd, SDIOD_FBR_CISPTR_0 + fbraddr);
-		sd_info("%s: Function %d CIS Ptr = 0x%x\n",
+		sd_debug("%s: Function %d CIS Ptr = 0x%x\n",
 		         __FUNCTION__, func, sd->func_cis_ptr[func]);
 	}
 
 	sd->func_cis_ptr[0] = sd->com_cis_ptr;
-	sd_info("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
+	sd_debug("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
 
 	/* Enable Function 1 */
 	sdio_claim_host(gInstance->func[1]);
@@ -788,7 +788,7 @@ sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *by
 #endif
 	int ret = 0;
 
-	sd_info("%s: rw=%d, func=%d, addr=0x%05x\n", __FUNCTION__, rw, func, regaddr);
+	sd_debug("%s: rw=%d, func=%d, addr=0x%05x\n", __FUNCTION__, rw, func, regaddr);
 
 	DHD_PM_RESUME_WAIT(sdioh_request_byte_wait);
 	DHD_PM_RESUME_RETURN_ERROR(SDIOH_API_RC_FAIL);
@@ -902,7 +902,7 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 		return SDIOH_API_RC_FAIL;
 	}
 
-	sd_info("%s: cmd_type=%d, rw=%d, func=%d, addr=0x%05x, nbytes=%d\n",
+	sd_debug("%s: cmd_type=%d, rw=%d, func=%d, addr=0x%05x, nbytes=%d\n",
 	         __FUNCTION__, cmd_type, rw, func, addr, nbytes);
 
 	DHD_PM_RESUME_WAIT(sdioh_request_word_wait);
