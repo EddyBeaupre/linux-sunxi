@@ -648,7 +648,7 @@ dhd_wlfc_hanger_create(osl_t *osh, int max_items)
 	memset(hanger, 0, WLFC_HANGER_SIZE(max_items));
 	hanger->max_items = max_items;
 
-	for (i = 0; i < max_items; i++) {
+	for (i = 0; i < hanger->max_items; i++) {
 		hanger->items[i].state = WLFC_HANGER_ITEM_STATE_FREE;
 	}
 	return hanger;
