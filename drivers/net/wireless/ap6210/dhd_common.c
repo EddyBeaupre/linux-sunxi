@@ -349,7 +349,7 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 		break;
 
 	case IOV_GVAL(IOV_WLMSGLEVEL):
-		AP6210_DEBUG("android_msg_level=0x%x\n", android_msg_level);
+		//AP6210_DEBUG("android_msg_level=0x%x\n", android_msg_level);
 #if defined(CONFIG_WIRELESS_EXT)
 		int_val = (int32)iw_msg_level;
 		bcopy(&int_val, arg, val_size);
@@ -375,8 +375,8 @@ dhd_doiovar(dhd_pub_t *dhd_pub, const bcm_iovar_t *vi, uint32 actionid, const ch
 		} else
 #endif
 		{
-			android_msg_level = (uint)int_val;
-			AP6210_DEBUG("android_msg_level=0x%x\n", android_msg_level);
+			//android_msg_level = (uint)int_val;
+			//AP6210_DEBUG("android_msg_level=0x%x\n", android_msg_level);
 		}
 		break;
 

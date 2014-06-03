@@ -372,7 +372,7 @@ module_param(iw_msg_level, int, 0);
 #ifdef WL_CFG80211
 module_param(wl_dbg_level, int, 0);
 #endif
-module_param(android_msg_level, int, 0);
+//module_param(android_msg_level, int, 0);
 
 /* Disable Prop tx */
 module_param(disable_proptx, int, 0644);
