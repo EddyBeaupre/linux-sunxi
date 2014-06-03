@@ -1177,7 +1177,7 @@ dhd_op_if(dhd_if_t *ifp)
 				dhd_os_spin_unlock(&dhd->pub, flags);
 		}
 #endif
-				AP6210_DEBUG("\n ==== pid:%x, net_device for if:%s created ===\n\n",
+				AP6210_DEBUG(" ==== pid:%x, net_device for if:%s created ===\n\n",
 					current->pid, ifp->net->name);
 				ifp->state = DHD_IF_NONE;
 			}
@@ -1188,7 +1188,7 @@ dhd_op_if(dhd_if_t *ifp)
 		/* dhd_op_if is called again from some other context */
 		ifp->state = DHD_IF_DELETING;
 		if (ifp->net != NULL) {
-			AP6210_DEBUG("\n%s: got 'DHD_IF_DEL' state\n", __FUNCTION__);
+			AP6210_DEBUG("%s: got 'DHD_IF_DEL' state\n", __FUNCTION__);
 			netif_stop_queue(ifp->net);
 #ifdef WL_CFG80211
 			if (dhd->dhd_state & DHD_ATTACH_STATE_CFG80211) {
@@ -1269,8 +1269,7 @@ _dhd_sysioc_thread(void *data)
 					dhd_op_if(dhd->iflist[i]);
 
 				if (dhd->iflist[i] == NULL) {
-					AP6210_DEBUG("\n\n %s: interface %d just been removed,"
-						"!\n\n", __FUNCTION__, i);
+					AP6210_DEBUG("%s: interface %d just been removed,!\n", __FUNCTION__, i);
 					continue;
 				}
 #ifdef SOFTAP
@@ -2683,7 +2682,7 @@ dhd_open(struct net_device *net)
 	mutex_lock(&_dhd_sdio_mutex_lock_);
 #endif 
 
-        AP6210_INFO("%s, firmware path %s\n", __func__, firmware_path);
+        AP6210_DEBUG("%s, firmware path %s\n", __func__, firmware_path);
 
 	DHD_OS_WAKE_LOCK(&dhd->pub);
 	/* Update FW path if it was changed */
@@ -2958,7 +2957,7 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 	dhd_attach_states_t dhd_state = DHD_ATTACH_STATE_INIT;
 	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
 
-	AP6210_INFO("%s, firmware path %s\n", __func__, firmware_path);
+	AP6210_DEBUG("%s, firmware path %s\n", __func__, firmware_path);
 
 	/* updates firmware nvram path if it was provided as module parameters */
 	if ((firmware_path != NULL) && (firmware_path[0] != '\0'))
@@ -4131,8 +4130,7 @@ dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
 		AP6210_ERR("couldn't register the net device, err %d\n", err);
 		goto fail;
 	}
-	AP6210_INFO("Broadcom Dongle Host Driver: register interface [%s]"
-		" MAC: "MACDBG"\n",
+	AP6210_INFO("Broadcom Dongle Host Driver: register interface [%s] MAC: "MACDBG"\n",
 		net->name,
 		MAC2STRDBG(net->dev_addr));
 
@@ -4465,7 +4463,7 @@ dhd_module_init(void)
 			chip_up = 1;
 			break;
 		}
-		AP6210_ERR("\nfailed to power up wifi chip, retry again (%d left) **\n\n",
+		AP6210_ERR("failed to power up wifi chip, retry again (%d left) **\n\n",
 			retry+1);
 		dhd_bus_unreg_sdio_notify();
 #if defined(CONFIG_WIFI_CONTROL_FUNC)
@@ -4475,7 +4473,7 @@ dhd_module_init(void)
 	} while (retry-- > 0);
 
 	if (!chip_up) {
-		AP6210_ERR("\nfailed to power up wifi chip, max retry reached, exits **\n\n");
+		AP6210_ERR("failed to power up wifi chip, max retry reached, exits **\n\n");
 		return -ENODEV;
 	}
 #else
@@ -4495,7 +4493,7 @@ dhd_module_init(void)
 	error = dhd_bus_register();
 
 	if (!error)
-		AP6210_INFO("\n%s\n", dhd_version);
+		AP6210_INFO("%s\n", dhd_version);
 	else {
 		AP6210_ERR("%s: sdio_register_driver failed\n", __FUNCTION__);
 		goto fail_1;
@@ -5592,9 +5590,9 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 {
 	int i;
 
-	i = snprintf(info_string, sizeof(info_string),
-		"  Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
-        AP6210_INFO("%s\n", info_string);
+	i = snprintf(info_string, sizeof(info_string), "Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
+	AP6210_INFO("%s\n", EPI_VERSION_STR);
+        AP6210_INFO("%s\n", fw);
 
 	if (!dhdp)
 		return;
@@ -5602,6 +5600,7 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 	i = snprintf(&info_string[i], sizeof(info_string) - i,
 		"\n  Chip: %x Rev %x Pkg %x", dhd_bus_chip_id(dhdp),
 		dhd_bus_chiprev_id(dhdp), dhd_bus_chippkg_id(dhdp));
+        AP6210_INFO("Chip: %x Rev %x Pkg %x", dhd_bus_chip_id(dhdp), dhd_bus_chiprev_id(dhdp), dhd_bus_chippkg_id(dhdp));
 }
 
 int dhd_ioctl_entry_local(struct net_device *net, wl_ioctl_t *ioc, int cmd)
@@ -5878,10 +5877,10 @@ static void dhd_dump_htsfhisto(histo_t *his, char *s)
 	int pktcnt = 0, curval = 0, i;
 	for (i = 0; i < (NUMBIN-2); i++) {
 		curval += 500;
-		AP6210_CONT("%d ",  his->bin[i]);
+		AP6210_DUMP("%d ",  his->bin[i]);
 		pktcnt += his->bin[i];
 	}
-	AP6210_CONT(" max: %d TotPkt: %d neg: %d [%s]\n", his->bin[NUMBIN-2], pktcnt,
+	AP6210_DUMP(" max: %d TotPkt: %d neg: %d [%s]\n", his->bin[NUMBIN-2], pktcnt,
 		his->bin[NUMBIN-1], s);
 }
 

@@ -6481,10 +6481,10 @@ dhd_dump_cis(uint fn, uint8 *cis)
 
 	for (tdata = byte = 0; byte < SBSDIO_CIS_SIZE_LIMIT; byte++) {
 		if ((byte % 16) == 0)
-			AP6210_CONT("    ");
-		AP6210_CONT("%02x ", cis[byte]);
+			AP6210_DUMP("    ");
+		AP6210_DUMP("%02x ", cis[byte]);
 		if ((byte % 16) == 15)
-			AP6210_CONT("\n");
+			AP6210_DUMP("\n");
 		if (!tdata--) {
 			tag = cis[byte];
 			if (tag == 0xff)
@@ -6494,11 +6494,11 @@ dhd_dump_cis(uint fn, uint8 *cis)
 			else if ((byte + 1) < SBSDIO_CIS_SIZE_LIMIT)
 				tdata = cis[byte + 1] + 1;
 			else
-				AP6210_CONT("]");
+				AP6210_DUMP("]");
 		}
 	}
 	if ((byte % 16) != 15)
-		AP6210_CONT("\n");
+		AP6210_DUMP("\n");
 }
 #endif /* DHD_DEBUG */
 

@@ -9,7 +9,8 @@
 #define AP6210_NOTICE(...)	pr_notice("[ap6210] "__VA_ARGS__)
 #define AP6210_INFO(...)	pr_info("[ap6210] "__VA_ARGS__)
 #define AP6210_DEBUG(...)	pr_debug("[ap6210] "__VA_ARGS__)
-#define AP6210_CONT(...)	pr_debug(__VA_ARGS__)
+#define AP6210_DUMP(...)	pr_debug(__VA_ARGS__)
+#define AP6210_CONT(...)	pr_cont(__VA_ARGS__)
 
 extern int __init sw_rfkill_init(void);
 extern void __exit sw_rfkill_exit(void);

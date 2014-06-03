@@ -2430,8 +2430,8 @@ wl_iw_set_pmksa(
 				bcm_ether_ntoa(&pmkidptr->pmkid[0].BSSID,
 				eabuf));
 			for (j = 0; j < WPA2_PMKID_LEN; j++)
-				AP6210_CONT("%02x ", pmkidptr->pmkid[0].PMKID[j]);
-			AP6210_CONT("\n");
+				AP6210_DUMP("%02x ", pmkidptr->pmkid[0].PMKID[j]);
+			AP6210_DUMP("\n");
 		}
 		for (i = 0; i < pmkid_list.pmkids.npmkid; i++)
 			if (!bcmp(&iwpmksa->bssid.sa_data[0], &pmkid_array[i].BSSID,
@@ -2462,8 +2462,8 @@ wl_iw_set_pmksa(
 				bcm_ether_ntoa(&pmkid_array[k].BSSID,
 				eabuf));
 			for (j = 0; j < WPA2_PMKID_LEN; j++)
-				AP6210_CONT("%02x ", pmkid_array[k].PMKID[j]);
-			AP6210_CONT("\n");
+				AP6210_DUMP("%02x ", pmkid_array[k].PMKID[j]);
+			AP6210_DUMP("\n");
 		}
 		pmkid_list.pmkids.npmkid++;
 	}
@@ -2474,7 +2474,7 @@ wl_iw_set_pmksa(
 			bcm_ether_ntoa(&pmkid_array[i].BSSID,
 			eabuf));
 		for (j = 0; j < WPA2_PMKID_LEN; j++)
-			AP6210_CONT("%02x ", pmkid_array[i].PMKID[j]);
+			AP6210_DUMP("%02x ", pmkid_array[i].PMKID[j]);
 		AP6210_DEBUG("\n");
 	}
 	AP6210_DEBUG("\n");

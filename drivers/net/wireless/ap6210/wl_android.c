@@ -319,8 +319,8 @@ static int wl_android_set_pno_setup(struct net_device *dev, char *command, int t
 #ifdef PNO_SET_DEBUG
 	memcpy(command, pno_in_example, sizeof(pno_in_example));
 	for (i = 0; i < sizeof(pno_in_example); i++)
-		AP6210_CONT("%02X ", command[i]);
-	AP6210_CONT("\n");
+		AP6210_DUMP("%02X ", command[i]);
+	AP6210_DUMP("\n");
 	total_len = sizeof(pno_in_example);
 #endif
 
@@ -417,12 +417,12 @@ int wl_android_wifi_on(struct net_device *dev)
 			ret = sdioh_start(NULL, 0);
 			if (ret == 0)
 				break;
-			AP6210_ERR("\nfailed to power up wifi chip, retry again (%d left) **\n\n",
+			AP6210_ERR("failed to power up wifi chip, retry again (%d left) **\n\n",
 				retry+1);
 			dhd_customer_gpio_wlan_ctrl(WLAN_RESET_OFF);
 		} while (retry-- >= 0);
 		if (ret != 0) {
-			AP6210_ERR("\nfailed to power up wifi chip, max retry reached **\n\n");
+			AP6210_ERR("failed to power up wifi chip, max retry reached **\n\n");
 			goto exit;
 		}
 		ret = dhd_dev_reset(dev, FALSE);

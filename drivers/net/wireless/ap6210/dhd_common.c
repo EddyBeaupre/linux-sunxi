@@ -969,7 +969,7 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		memcpy(&hdr, buf, MSGTRACE_HDRLEN);
 
 		if (hdr.version != MSGTRACE_VERSION) {
-			AP6210_DEBUG("\nMACEVENT: %s [unsupported version --> "
+			AP6210_DEBUG("MACEVENT: %s [unsupported version --> "
 			       "dhd version:%d dongle version:%d]\n",
 			       event_name, MSGTRACE_VERSION, hdr.version);
 			/* Reset datalen to avoid display below */
@@ -981,14 +981,14 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		buf[MSGTRACE_HDRLEN + ntoh16(hdr.len)] = '\0';
 
 		if (ntoh32(hdr.discarded_bytes) || ntoh32(hdr.discarded_printf)) {
-			AP6210_DEBUG("\nWLC_E_TRACE: [Discarded traces in dongle -->"
+			AP6210_DEBUG("WLC_E_TRACE: [Discarded traces in dongle -->"
 			       "discarded_bytes %d discarded_printf %d]\n",
 			       ntoh32(hdr.discarded_bytes), ntoh32(hdr.discarded_printf));
 		}
 
 		nblost = ntoh32(hdr.seqnum) - seqnum_prev - 1;
 		if (nblost > 0) {
-			AP6210_DEBUG("\nWLC_E_TRACE: [Event lost --> seqnum %d nblost %d\n",
+			AP6210_DEBUG("WLC_E_TRACE: [Event lost --> seqnum %d nblost %d\n",
 			       ntoh32(hdr.seqnum), nblost);
 		}
 		seqnum_prev = ntoh32(hdr.seqnum);
@@ -1032,8 +1032,8 @@ wl_show_host_event(wl_event_msg_t *event, void *event_data)
 		buf = (uchar *) event_data;
 		AP6210_DEBUG(" data (%d) : ", datalen);
 		for (i = 0; i < datalen; i++)
-			AP6210_CONT(" 0x%02x ", *buf++);
-		AP6210_CONT("\n");
+			AP6210_DUMP(" 0x%02x ", *buf++);
+		AP6210_DUMP("\n");
 	}
 }
 #endif /* SHOW_EVENTS */
@@ -1238,16 +1238,16 @@ dhd_print_buf(void *pbuf, int len, int bytes_per_line)
 	}
 
 	for (i = 0; i < len; i++) {
-		AP6210_CONT("%2.2x", *buf++);
+		AP6210_DUMP("%2.2x", *buf++);
 		j++;
 		if (j == bytes_per_line) {
-			AP6210_CONT("\n");
+			AP6210_DUMP("\n");
 			j = 0;
 		} else {
-			AP6210_CONT(":");
+			AP6210_DUMP(":");
 		}
 	}
-	AP6210_CONT("\n");
+	AP6210_DUMP("\n");
 #endif /* DHD_DEBUG */
 }
 

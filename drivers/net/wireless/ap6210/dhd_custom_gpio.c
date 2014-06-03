@@ -147,7 +147,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 			wifi_set_power(0, 0);
 #endif
 			mdelay(100);
-			AP6210_ERR("=========== WLAN placed in RESET ========\n");
+			AP6210_ERR("WLAN placed in RESET\n");
 		break;
 
 		case WLAN_RESET_ON:
@@ -160,7 +160,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 			wifi_set_power(1, 0);
 #endif
 			mdelay(100);
-			AP6210_ERR("=========== WLAN going back to live  ========\n");
+			AP6210_ERR("WLAN going back to live\n");
 		break;
 
 		case WLAN_POWER_OFF:
@@ -170,7 +170,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 			ap6210_gpio_wifi_power(0);
 			sunximmc_rescan_card(sdc_id, 0);
 #endif /* CUSTOMER_HW */
-			AP6210_ERR("=========== WLAN placed in POWER OFF ========\n");
+			AP6210_ERR("WLAN placed in POWER OFF\n");
 		break;
 
 		case WLAN_POWER_ON:
@@ -182,7 +182,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 			/* Lets customer power to get stable */
 #endif /* CUSTOMER_HW */
 			mdelay(100);
-			AP6210_ERR("=========== WLAN placed in POWER ON ========\n");
+			AP6210_ERR("WLAN placed in POWER ON\n");
 		break;
 	}
 }
