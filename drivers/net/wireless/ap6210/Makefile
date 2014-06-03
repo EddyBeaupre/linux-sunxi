@@ -18,7 +18,8 @@ DHDCFLAGS = -Wall -Wstrict-prototypes -Dlinux -DBCMDRIVER                \
 DHDOFILES = aiutils.o bcmsdh_sdmmc_linux.o dhd_linux.o siutils.o bcmutils.o   \
 	dhd_linux_sched.o dhd_sdio.o bcmwifi_channels.o bcmevent.o hndpmu.o   \
 	bcmsdh.o dhd_cdc.o bcmsdh_linux.o dhd_common.o linux_osl.o            \
-	bcmsdh_sdmmc.o dhd_custom_gpio.o sbutils.o wldev_common.o wl_android.o
+	bcmsdh_sdmmc.o dhd_custom_gpio.o sbutils.o wldev_common.o wl_android.o \
+	ap6210_gpio_wifi.o ap6210_gpio_bt.o
 
 obj-$(CONFIG_AP6210) += ap6210.o
 ap6210-objs += $(DHDOFILES)
@@ -60,5 +61,5 @@ endif
 
 # GPIO Power Management Modules
 
-obj-$(CONFIG_AP6210) += ap6210_gpio_wifi.o
-obj-$(CONFIG_AP6210) += ap6210_gpio_bt.o
+#obj-$(CONFIG_AP6210) += ap6210_gpio_wifi.o
+#obj-$(CONFIG_AP6210) += ap6210_gpio_bt.o

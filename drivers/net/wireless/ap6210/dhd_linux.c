@@ -71,6 +71,7 @@
 #include <dhd_bta.h>
 #endif
 
+#include <ap6210_gpio.h>
 #include <ap6210.h>
 
 #ifdef WLMEDIA_HTSF
@@ -4398,6 +4399,9 @@ dhd_module_cleanup(void)
 	if (wl_host_wake > 0)
 		gpio_free(wl_host_wake);
 	wl_host_wake = -1;
+	
+	sw_rfkill_exit();
+	ap6210_gpio_wifi_exit();
 }
 
 
@@ -4405,13 +4409,16 @@ static int __init
 dhd_module_init(void)
 {
 	int error = 0;
-
+	
 #if 1 && defined(BCMLXSDMMC) && (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27))
 	int retry = POWERUP_MAX_RETRY;
 	int chip_up = 0;
 #endif 
 
 	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
+
+	ap6210_gpio_wifi_init();
+	sw_rfkill_init();
 
 	if (gpio_request(WL_HOST_WAKE_DEF_GPIO, "wl_host_wake")) {
 		AP6210_ERR("[%s] get wl_host_wake gpio failed\n", __FUNCTION__);

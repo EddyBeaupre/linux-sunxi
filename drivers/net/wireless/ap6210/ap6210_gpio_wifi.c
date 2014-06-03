@@ -405,7 +405,7 @@ static struct platform_driver ap6210_gpio_wifi_driver = {
 	.remove         = __devexit_p(ap6210_gpio_wifi_remove),
 };
 
-static int __init ap6210_gpio_wifi_init(void)
+int __init ap6210_gpio_wifi_init(void)
 {
 	struct ap6210_gpio_wifi_ops *ops = &ap6210_wifi_select_pm_ops;
 
@@ -418,7 +418,7 @@ static int __init ap6210_gpio_wifi_init(void)
 	return platform_driver_register(&ap6210_gpio_wifi_driver);
 }
 
-static void __exit ap6210_gpio_wifi_exit(void)
+void __exit ap6210_gpio_wifi_exit(void)
 {
 	struct ap6210_gpio_wifi_ops *ops = &ap6210_wifi_select_pm_ops;
 	if (!ops->wifi_used)
@@ -428,12 +428,9 @@ static void __exit ap6210_gpio_wifi_exit(void)
 	memset(ops, 0, sizeof(struct ap6210_gpio_wifi_ops));
 }
 
-
-
-
+/*
 module_init(ap6210_gpio_wifi_init);
 module_exit(ap6210_gpio_wifi_exit);
 
 MODULE_LICENSE("GPL");
-
-
+*/

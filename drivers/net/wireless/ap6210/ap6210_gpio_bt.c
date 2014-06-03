@@ -126,7 +126,7 @@ static struct platform_device sw_rfkill_dev = {
 	.name = "sunxi-rfkill",
 };
 
-static int __init sw_rfkill_init(void)
+int __init sw_rfkill_init(void)
 {
 	if (SCRIPT_PARSER_OK != script_parser_fetch("bt_para", "bt_used", &bt_used, 1)) {
 		BT_WRN("parse bt_used failed in script.fex.\n" );
@@ -143,7 +143,7 @@ static int __init sw_rfkill_init(void)
 	return platform_driver_register(&sw_rfkill_driver);
 }
 
-static void __exit sw_rfkill_exit(void)
+void __exit sw_rfkill_exit(void)
 {
 	if (!bt_used) {
 		BT_INF("exit no bt used in configuration\n" );
@@ -154,10 +154,12 @@ static void __exit sw_rfkill_exit(void)
 	platform_driver_unregister(&sw_rfkill_driver);
 }
 
+/*
 module_init(sw_rfkill_init);
 module_exit(sw_rfkill_exit);
 
 MODULE_DESCRIPTION("sunxi-rfkill driver");
 MODULE_AUTHOR("Aaron.magic<mgaic@reuuimllatech.com>");
 MODULE_LICENSE("GPL");
+*/
 
