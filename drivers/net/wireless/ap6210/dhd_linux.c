@@ -6060,10 +6060,10 @@ dhd_ioctl_htsf_get(dhd_info_t *dhd, int ifidx)
 	s2 = dhd_get_htsf(dhd, 0);
 
 	memcpy(&tsf_buf, buf, sizeof(tsf_buf));
-	AP6210_CONT(" TSF_h=%04X lo=%08X Calc:htsf=%08X, coef=%d.%d%d delta=%d ",
+	AP6210_DEBUG("TSF_h=%04X lo=%08X Calc:htsf=%08X, coef=%d.%d%d delta=%d ",
 		tsf_buf.high, tsf_buf.low, s2, dhd->htsf.coef, dhd->htsf.coefdec1,
 		dhd->htsf.coefdec2, s2-tsf_buf.low);
-	AP6210_CONT("lasttsf=%08X lastcycle=%08X\n", dhd->htsf.last_tsf, dhd->htsf.last_cycle);
+	AP6210_DEBUG("lasttsf=%08X lastcycle=%08X\n", dhd->htsf.last_tsf, dhd->htsf.last_cycle);
 	return 0;
 }
 

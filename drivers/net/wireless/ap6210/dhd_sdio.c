@@ -7742,14 +7742,14 @@ dhd_bus_devreset(dhd_pub_t *dhdp, uint8 flag)
 #endif
 			dhd_os_sdunlock(dhdp);
 
-			AP6210_ERR("%s:  WLAN OFF DONE\n", __FUNCTION__);
+			AP6210_ERR("%s: WLAN OFF DONE\n", __FUNCTION__);
 			/* App can now remove power from device */
 		} else
 			bcmerror = BCME_SDIO_ERROR;
 	} else {
 		/* App must have restored power to device before calling */
 
-		AP6210_ERR("\n\n%s: == WLAN ON ==\n", __FUNCTION__);
+		AP6210_ERR("%s: WLAN ON\n", __FUNCTION__);
 
 		if (bus->dhd->dongle_reset) {
 			/* Turn on WLAN */

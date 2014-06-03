@@ -1020,7 +1020,7 @@ osl_assert(const char *exp, const char *file, int line)
 	snprintf(tempbuf, 64, "\"%s\": file \"%s\", line %d\n",
 		exp, basename, line);
 
-	AP6210_CONT("%s", tempbuf);
+	AP6210_DEBUG("%s", tempbuf);
 
 
 }

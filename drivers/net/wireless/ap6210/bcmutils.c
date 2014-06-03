@@ -1995,7 +1995,7 @@ bcm_print_bytes(const char *name, const uchar *data, int len)
 	int i;
 	int per_line = 0;
 
-	AP6210_INFO("%s: %d \n", name ? name : "", len);
+	AP6210_DEBUG("%s: %d \n", name ? name : "", len);
 	for (i = 0; i < len; i++) {
 		AP6210_CONT("%02x ", *data++);
 		per_line++;
