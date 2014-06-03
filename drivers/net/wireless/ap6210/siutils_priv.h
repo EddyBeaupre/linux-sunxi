@@ -27,16 +27,6 @@
 #ifndef	_siutils_priv_h_
 #define	_siutils_priv_h_
 
-#define	SI_ERROR(...) AP6210_INFO(__VA_ARGS__)
-
-#define	SI_MSG(...)
-
-#ifdef BCMDBG_SI
-#define	SI_VMSG(...)	AP6210_INFO(__VA_ARGS__)
-#else
-#define	SI_VMSG(...)
-#endif
-
 #define	IS_SIM(chippkg)	((chippkg == HDLSIM_PKG_ID) || (chippkg == HWSIM_PKG_ID))
 
 typedef uint32 (*si_intrsoff_t)(void *intr_arg);

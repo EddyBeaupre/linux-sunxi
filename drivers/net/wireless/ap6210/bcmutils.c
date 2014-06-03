@@ -1752,14 +1752,14 @@ printbig(char *buf)
 	while (len > max_len) {
 		c = buf[max_len];
 		buf[max_len] = '\0';
-		pr_info("%s", buf);
+		AP6210_CONT("%s", buf);
 		buf[max_len] = c;
 
 		buf += max_len;
 		len -= max_len;
 	}
 	/* print the remaining string */
-	pr_info("%s\n", buf);
+	AP6210_CONT("%s\n", buf);
 	return;
 }
 
@@ -1997,14 +1997,14 @@ bcm_print_bytes(const char *name, const uchar *data, int len)
 
 	AP6210_INFO("%s: %d \n", name ? name : "", len);
 	for (i = 0; i < len; i++) {
-		pr_info("%02x ", *data++);
+		AP6210_CONT("%02x ", *data++);
 		per_line++;
 		if (per_line == 16) {
 			per_line = 0;
-			pr_info("\n");
+			AP6210_CONT("\n");
 		}
 	}
-	pr_info("\n");
+	AP6210_CONT("\n");
 }
 #if defined(WLTINYDUMP) || defined(WLMSG_INFORM) || defined(WLMSG_ASSOC) || \
 	defined(WLMSG_PRPKT) || defined(WLMSG_WSEC)

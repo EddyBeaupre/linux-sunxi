@@ -26,19 +26,6 @@
 #ifndef	_BCM_SD_SPI_H
 #define	_BCM_SD_SPI_H
 
-/* global msglevel for debug messages - bitvals come from sdiovar.h */
-
-#define sd_err(...)	AP6210_ERR(__VA_ARGS__)
-#define sd_trace(...)	AP6210_DEBUG(__VA_ARGS__)
-#define sd_info(...)	AP6210_INFO(__VA_ARGS__)
-#define sd_debug(...)	AP6210_DEBUG(__VA_ARGS__)
-#define sd_data(...)	AP6210_DEBUG(__VA_ARGS__)
-#define sd_ctrl(...)	AP6210_DEBUG(__VA_ARGS__)
-
-#define sd_log(x)
-
-#define SDIOH_ASSERT(exp) do { if (!(exp)) AP6210_INFO("!!!ASSERT fail: file %s lines %d", __FILE__, __LINE__); } while (0)
-
 #define BLOCK_SIZE_4318 64
 #define BLOCK_SIZE_4328 512
 

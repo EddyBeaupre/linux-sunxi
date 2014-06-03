@@ -96,30 +96,30 @@ sdioh_sdmmc_card_enablefuncs(sdioh_info_t *sd)
 	uint32 fbraddr;
 	uint8 func;
 
-	sd_trace("%s\n", __FUNCTION__);;
+	AP6210_DEBUG("%s\n", __FUNCTION__);;
 
 	/* Get the Card's common CIS address */
 	sd->com_cis_ptr = sdioh_sdmmc_get_cisaddr(sd, SDIOD_CCCR_CISPTR_0);
 	sd->func_cis_ptr[0] = sd->com_cis_ptr;
-	sd_debug("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
+	AP6210_DEBUG("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
 
 	/* Get the Card's function CIS (for each function) */
 	for (fbraddr = SDIOD_FBR_STARTADDR, func = 1;
 	     func <= sd->num_funcs; func++, fbraddr += SDIOD_FBR_SIZE) {
 		sd->func_cis_ptr[func] = sdioh_sdmmc_get_cisaddr(sd, SDIOD_FBR_CISPTR_0 + fbraddr);
-		sd_debug("%s: Function %d CIS Ptr = 0x%x\n",
+		AP6210_DEBUG("%s: Function %d CIS Ptr = 0x%x\n",
 		         __FUNCTION__, func, sd->func_cis_ptr[func]);
 	}
 
 	sd->func_cis_ptr[0] = sd->com_cis_ptr;
-	sd_debug("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
+	AP6210_DEBUG("%s: Card's Common CIS Ptr = 0x%x\n", __FUNCTION__, sd->com_cis_ptr);
 
 	/* Enable Function 1 */
 	sdio_claim_host(gInstance->func[1]);
 	err_ret = sdio_enable_func(gInstance->func[1]);
 	sdio_release_host(gInstance->func[1]);
 	if (err_ret) {
-		sd_err("bcmsdh_sdmmc: Failed to enable F1 Err: 0x%08x", err_ret);
+		AP6210_ERR("bcmsdh_sdmmc: Failed to enable F1 Err: 0x%08x", err_ret);
 	}
 
 	return FALSE;
@@ -134,21 +134,21 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 	sdioh_info_t *sd;
 	int err_ret;
 
-	sd_trace("%s\n", __FUNCTION__);
+	AP6210_DEBUG("%s\n", __FUNCTION__);
 
 	if (gInstance == NULL) {
-		sd_err("%s: SDIO Device not present\n", __FUNCTION__);
+		AP6210_ERR("%s: SDIO Device not present\n", __FUNCTION__);
 		return NULL;
 	}
 
 	if ((sd = (sdioh_info_t *)MALLOC(osh, sizeof(sdioh_info_t))) == NULL) {
-		sd_err("sdioh_attach: out of memory, malloced %d bytes\n", MALLOCED(osh));
+		AP6210_ERR("sdioh_attach: out of memory, malloced %d bytes\n", MALLOCED(osh));
 		return NULL;
 	}
 	bzero((char *)sd, sizeof(sdioh_info_t));
 	sd->osh = osh;
 	if (sdioh_sdmmc_osinit(sd) != 0) {
-		sd_err("%s:sdioh_sdmmc_osinit() failed\n", __FUNCTION__);
+		AP6210_ERR("%s:sdioh_sdmmc_osinit() failed\n", __FUNCTION__);
 		MFREE(sd->osh, sd, sizeof(sdioh_info_t));
 		return NULL;
 	}
@@ -168,13 +168,13 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 		sd->client_block_size[1] = 64;
 		err_ret = sdio_set_block_size(gInstance->func[1], 64);
 		if (err_ret) {
-			sd_err("bcmsdh_sdmmc: Failed to set F1 blocksize\n");
+			AP6210_ERR("bcmsdh_sdmmc: Failed to set F1 blocksize\n");
 		}
 
 		/* Release host controller F1 */
 		sdio_release_host(gInstance->func[1]);
 	} else {
-		sd_err("%s:gInstance->func[1] is null\n", __FUNCTION__);
+		AP6210_ERR("%s:gInstance->func[1] is null\n", __FUNCTION__);
 		MFREE(sd->osh, sd, sizeof(sdioh_info_t));
 		return NULL;
 	}
@@ -186,21 +186,21 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 		sd->client_block_size[2] = sd_f2_blocksize;
 		err_ret = sdio_set_block_size(gInstance->func[2], sd_f2_blocksize);
 		if (err_ret) {
-			sd_err("bcmsdh_sdmmc: Failed to set F2 blocksize to %d\n",
+			AP6210_ERR("bcmsdh_sdmmc: Failed to set F2 blocksize to %d\n",
 				sd_f2_blocksize);
 		}
 
 		/* Release host controller F2 */
 		sdio_release_host(gInstance->func[2]);
 	} else {
-		sd_err("%s:gInstance->func[2] is null\n", __FUNCTION__);
+		AP6210_ERR("%s:gInstance->func[2] is null\n", __FUNCTION__);
 		MFREE(sd->osh, sd, sizeof(sdioh_info_t));
 		return NULL;
 	}
 
 	sdioh_sdmmc_card_enablefuncs(sd);
 
-	sd_trace("%s: Done\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Done\n", __FUNCTION__);
 	return sd;
 }
 
@@ -208,7 +208,7 @@ sdioh_attach(osl_t *osh, void *bar0, uint irq)
 extern SDIOH_API_RC
 sdioh_detach(osl_t *osh, sdioh_info_t *sd)
 {
-	sd_trace("%s\n", __FUNCTION__);
+	AP6210_DEBUG("%s\n", __FUNCTION__);
 
 	if (sd) {
 
@@ -248,7 +248,7 @@ sdioh_enable_func_intr(void)
 
 		reg = sdio_readb(gInstance->func[0], SDIOD_CCCR_INTEN, &err);
 		if (err) {
-			sd_err("%s: error for read SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
+			AP6210_ERR("%s: error for read SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
 			sdio_release_host(gInstance->func[0]);
 			return SDIOH_API_RC_FAIL;
 		}
@@ -260,7 +260,7 @@ sdioh_enable_func_intr(void)
 		sdio_release_host(gInstance->func[0]);
 
 		if (err) {
-			sd_err("%s: error for write SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
+			AP6210_ERR("%s: error for write SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
 			return SDIOH_API_RC_FAIL;
 		}
 	}
@@ -278,7 +278,7 @@ sdioh_disable_func_intr(void)
 		sdio_claim_host(gInstance->func[0]);
 		reg = sdio_readb(gInstance->func[0], SDIOD_CCCR_INTEN, &err);
 		if (err) {
-			sd_err("%s: error for read SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
+			AP6210_ERR("%s: error for read SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
 			sdio_release_host(gInstance->func[0]);
 			return SDIOH_API_RC_FAIL;
 		}
@@ -291,7 +291,7 @@ sdioh_disable_func_intr(void)
 
 		sdio_release_host(gInstance->func[0]);
 		if (err) {
-			sd_err("%s: error for write SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
+			AP6210_ERR("%s: error for write SDIO_CCCR_IENx : 0x%x\n", __FUNCTION__, err);
 			return SDIOH_API_RC_FAIL;
 		}
 	}
@@ -303,9 +303,9 @@ sdioh_disable_func_intr(void)
 extern SDIOH_API_RC
 sdioh_interrupt_register(sdioh_info_t *sd, sdioh_cb_fn_t fn, void *argh)
 {
-	sd_trace("%s: Entering\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Entering\n", __FUNCTION__);
 	if (fn == NULL) {
-		sd_err("%s: interrupt handler is NULL, not registering\n", __FUNCTION__);
+		AP6210_ERR("%s: interrupt handler is NULL, not registering\n", __FUNCTION__);
 		return SDIOH_API_RC_FAIL;
 	}
 #if !defined(OOB_INTR_ONLY)
@@ -335,7 +335,7 @@ sdioh_interrupt_register(sdioh_info_t *sd, sdioh_cb_fn_t fn, void *argh)
 extern SDIOH_API_RC
 sdioh_interrupt_deregister(sdioh_info_t *sd)
 {
-	sd_trace("%s: Entering\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Entering\n", __FUNCTION__);
 
 #if !defined(OOB_INTR_ONLY)
 	if (gInstance->func[1]) {
@@ -365,7 +365,7 @@ sdioh_interrupt_deregister(sdioh_info_t *sd)
 extern SDIOH_API_RC
 sdioh_interrupt_query(sdioh_info_t *sd, bool *onoff)
 {
-	sd_trace("%s: Entering\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Entering\n", __FUNCTION__);
 	*onoff = sd->client_intr_enabled;
 	return SDIOH_API_RC_SUCCESS;
 }
@@ -441,7 +441,7 @@ sdioh_iovar_op(sdioh_info_t *si, const char *name,
 	ASSERT(set || (arg && len));
 	ASSERT(!set || (!params && !plen));
 
-	sd_trace("%s: Enter (%s %s)\n", __FUNCTION__, (set ? "set" : "get"), name);
+	AP6210_DEBUG("%s: Enter (%s %s)\n", __FUNCTION__, (set ? "set" : "get"), name);
 
 	if ((vi = bcm_iovar_lookup(sdioh_iovars, name)) == NULL) {
 		bcmerror = BCME_UNSUPPORTED;
@@ -619,12 +619,12 @@ sdioh_iovar_op(sdioh_info_t *si, const char *name,
 		sdreg_t *sd_ptr = (sdreg_t *)params;
 
 		if (sd_ptr->offset < SD_SysAddr || sd_ptr->offset > SD_MaxCurCap) {
-			sd_err("%s: bad offset 0x%x\n", __FUNCTION__, sd_ptr->offset);
+			AP6210_ERR("%s: bad offset 0x%x\n", __FUNCTION__, sd_ptr->offset);
 			bcmerror = BCME_BADARG;
 			break;
 		}
 
-		sd_trace("%s: rreg%d at offset %d\n", __FUNCTION__,
+		AP6210_DEBUG("%s: rreg%d at offset %d\n", __FUNCTION__,
 		                  (sd_ptr->offset & 1) ? 8 : ((sd_ptr->offset & 2) ? 16 : 32),
 		                  sd_ptr->offset);
 		if (sd_ptr->offset & 1)
@@ -643,12 +643,12 @@ sdioh_iovar_op(sdioh_info_t *si, const char *name,
 		sdreg_t *sd_ptr = (sdreg_t *)params;
 
 		if (sd_ptr->offset < SD_SysAddr || sd_ptr->offset > SD_MaxCurCap) {
-			sd_err("%s: bad offset 0x%x\n", __FUNCTION__, sd_ptr->offset);
+			AP6210_ERR("%s: bad offset 0x%x\n", __FUNCTION__, sd_ptr->offset);
 			bcmerror = BCME_BADARG;
 			break;
 		}
 
-		sd_trace("%s: wreg%d value 0x%08x at offset %d\n", __FUNCTION__, sd_ptr->value,
+		AP6210_DEBUG("%s: wreg%d value 0x%08x at offset %d\n", __FUNCTION__, sd_ptr->value,
 		                  (sd_ptr->offset & 1) ? 8 : ((sd_ptr->offset & 2) ? 16 : 32),
 		                  sd_ptr->offset);
 		break;
@@ -735,7 +735,7 @@ sdioh_sdmmc_get_cisaddr(sdioh_info_t *sd, uint32 regaddr)
 	uint8 *ptr = (uint8 *)&scratch;
 	for (i = 0; i < 3; i++) {
 		if ((sdioh_sdmmc_card_regread (sd, 0, regaddr, 1, &regdata)) != SUCCESS)
-			sd_err("%s: Can't read!\n", __FUNCTION__);
+			AP6210_ERR("%s: Can't read!\n", __FUNCTION__);
 
 		*ptr++ = (uint8) regdata;
 		regaddr++;
@@ -755,20 +755,20 @@ sdioh_cis_read(sdioh_info_t *sd, uint func, uint8 *cisd, uint32 length)
 	uint32 foo;
 	uint8 *cis = cisd;
 
-	sd_trace("%s: Func = %d\n", __FUNCTION__, func);
+	AP6210_DEBUG("%s: Func = %d\n", __FUNCTION__, func);
 
 	if (!sd->func_cis_ptr[func]) {
 		bzero(cis, length);
-		sd_err("%s: no func_cis_ptr[%d]\n", __FUNCTION__, func);
+		AP6210_ERR("%s: no func_cis_ptr[%d]\n", __FUNCTION__, func);
 		return SDIOH_API_RC_FAIL;
 	}
 
-	sd_err("%s: func_cis_ptr[%d]=0x%04x\n", __FUNCTION__, func, sd->func_cis_ptr[func]);
+	AP6210_ERR("%s: func_cis_ptr[%d]=0x%04x\n", __FUNCTION__, func, sd->func_cis_ptr[func]);
 
 	for (count = 0; count < length; count++) {
 		offset =  sd->func_cis_ptr[func] + count;
 		if (sdioh_sdmmc_card_regread (sd, 0, offset, 1, &foo) < 0) {
-			sd_err("%s: regread failed: Can't read CIS\n", __FUNCTION__);
+			AP6210_ERR("%s: regread failed: Can't read CIS\n", __FUNCTION__);
 			return SDIOH_API_RC_FAIL;
 		}
 
@@ -788,7 +788,7 @@ sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *by
 #endif
 	int ret = 0;
 
-	sd_debug("%s: rw=%d, func=%d, addr=0x%05x\n", __FUNCTION__, rw, func, regaddr);
+	AP6210_DEBUG("%s: rw=%d, func=%d, addr=0x%05x\n", __FUNCTION__, rw, func, regaddr);
 
 	DHD_PM_RESUME_WAIT(sdioh_request_byte_wait);
 	DHD_PM_RESUME_RETURN_ERROR(SDIOH_API_RC_FAIL);
@@ -804,14 +804,14 @@ sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *by
 						/* Enable Function 2 */
 						err_ret = sdio_enable_func(gInstance->func[2]);
 						if (err_ret) {
-							sd_err("bcmsdh_sdmmc: enable F2 failed:%d",
+							AP6210_ERR("bcmsdh_sdmmc: enable F2 failed:%d",
 								err_ret);
 						}
 					} else {
 						/* Disable Function 2 */
 						err_ret = sdio_disable_func(gInstance->func[2]);
 						if (err_ret) {
-							sd_err("bcmsdh_sdmmc: Disab F2 failed:%d",
+							AP6210_ERR("bcmsdh_sdmmc: Disab F2 failed:%d",
 								err_ret);
 						}
 					}
@@ -843,7 +843,7 @@ sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *by
 			}
 #endif /* MMC_SDIO_ABORT */
 			else if (regaddr < 0xF0) {
-				sd_err("bcmsdh_sdmmc: F0 Wr:0x%02x: write disallowed\n", regaddr);
+				AP6210_ERR("bcmsdh_sdmmc: F0 Wr:0x%02x: write disallowed\n", regaddr);
 			} else {
 				/* Claim host controller, perform F0 write, and release */
 				if (gInstance->func[func]) {
@@ -877,10 +877,10 @@ sdioh_request_byte(sdioh_info_t *sd, uint rw, uint func, uint regaddr, uint8 *by
 	//AW judge sdio read write timeout, 1s
 	ret = sw_mci_check_r1_ready(gInstance->func[func]->card->host, 1000);
 	if (ret != 0)
-		sd_trace("%s data timeout.\n", __FUNCTION__);	
+		AP6210_DEBUG("%s data timeout.\n", __FUNCTION__);	
 
 	if (err_ret) {
-		sd_err("bcmsdh_sdmmc: Failed to %s byte F%d:@0x%05x=%02x, Err: %d\n",
+		AP6210_ERR("bcmsdh_sdmmc: Failed to %s byte F%d:@0x%05x=%02x, Err: %d\n",
 		                        rw ? "Write" : "Read", func, regaddr, *byte, err_ret);
 	}
 
@@ -898,11 +898,11 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 	int ret = 0;
 
 	if (func == 0) {
-		sd_err("%s: Only CMD52 allowed to F0.\n", __FUNCTION__);
+		AP6210_ERR("%s: Only CMD52 allowed to F0.\n", __FUNCTION__);
 		return SDIOH_API_RC_FAIL;
 	}
 
-	sd_debug("%s: cmd_type=%d, rw=%d, func=%d, addr=0x%05x, nbytes=%d\n",
+	AP6210_DEBUG("%s: cmd_type=%d, rw=%d, func=%d, addr=0x%05x, nbytes=%d\n",
 	         __FUNCTION__, cmd_type, rw, func, addr, nbytes);
 
 	DHD_PM_RESUME_WAIT(sdioh_request_word_wait);
@@ -916,7 +916,7 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 		} else if (nbytes == 2) {
 			sdio_writew(gInstance->func[func], (*word & 0xFFFF), addr, &err_ret);
 		} else {
-			sd_err("%s: Invalid nbytes: %d\n", __FUNCTION__, nbytes);
+			AP6210_ERR("%s: Invalid nbytes: %d\n", __FUNCTION__, nbytes);
 		}
 	} else { /* CMD52 Read */
 		if (nbytes == 4) {
@@ -924,14 +924,14 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 		} else if (nbytes == 2) {
 			*word = sdio_readw(gInstance->func[func], addr, &err_ret) & 0xFFFF;
 		} else {
-			sd_err("%s: Invalid nbytes: %d\n", __FUNCTION__, nbytes);
+			AP6210_ERR("%s: Invalid nbytes: %d\n", __FUNCTION__, nbytes);
 		}
 	}
 
 	//AW judge sdio read write timeout, 1s
 	ret = sw_mci_check_r1_ready(gInstance->func[func]->card->host, 1000);
 	if (ret != 0)
-		sd_trace("%s data timeout.\n", __FUNCTION__);
+		AP6210_DEBUG("%s data timeout.\n", __FUNCTION__);
 
 	/* Release host controller */
 	sdio_release_host(gInstance->func[func]);
@@ -957,7 +957,7 @@ sdioh_request_word(sdioh_info_t *sd, uint cmd_type, uint rw, uint func, uint add
 		if (err_ret)
 #endif /* MMC_SDIO_ABORT */
 		{
-		sd_err("bcmsdh_sdmmc: Failed to %s word, Err: 0x%08x\n",
+		AP6210_ERR("bcmsdh_sdmmc: Failed to %s word, Err: 0x%08x\n",
 		                        rw ? "Write" : "Read", err_ret);
 		}
 	}
@@ -981,7 +981,7 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 	struct mmc_data mmc_dat;
 	int ret = 0;
 
-	sd_trace("%s: Enter\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
 
 	ASSERT(pkt);
 	DHD_PM_RESUME_WAIT(sdioh_request_packet_wait);
@@ -1002,7 +1002,7 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 	}
 	lft_len = ttl_len - dma_len;
 
-	sd_trace("%s: %s %dB to func%d:%08x, %d blks with DMA, %dB leftover\n",
+	AP6210_DEBUG("%s: %s %dB to func%d:%08x, %d blks with DMA, %dB leftover\n",
 		__FUNCTION__, write ? "W" : "R",
 		ttl_len, func, addr, blk_num, lft_len);
 
@@ -1031,7 +1031,7 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 				pkt_len);
 
 			if (SGCount >= SDIOH_SDMMC_MAX_SG_ENTRIES) {
-				sd_err("%s: sg list entries exceed limit\n",
+				AP6210_ERR("%s: sg list entries exceed limit\n",
 					__FUNCTION__);
 				return (SDIOH_API_RC_FAIL);
 			}
@@ -1062,11 +1062,11 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 
 		err_ret = mmc_cmd.error? mmc_cmd.error : mmc_dat.error;
 		if (0 != err_ret) {
-			sd_err("%s:CMD53 %s failed with code %d\n",
+			AP6210_ERR("%s:CMD53 %s failed with code %d\n",
 			       __FUNCTION__,
 			       write ? "write" : "read",
 			       err_ret);
-			sd_err("%s:Disabling rxchain and fire it with PIO\n",
+			AP6210_ERR("%s:Disabling rxchain and fire it with PIO\n",
 			       __FUNCTION__);
 			sd->use_rxchain = FALSE;
 			pkt = pprev;
@@ -1100,7 +1100,7 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 
 #ifdef CONFIG_MMC_MSM7X00A
 			if ((pkt_len % 64) == 32) {
-				sd_trace("%s: Rounding up TX packet +=32\n", __FUNCTION__);
+				AP6210_DEBUG("%s: Rounding up TX packet +=32\n", __FUNCTION__);
 				pkt_len += 32;
 			}
 #endif /* CONFIG_MMC_MSM7X00A */
@@ -1125,15 +1125,15 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 			//AW judge sdio read write timeout, 1s
 			ret = sw_mci_check_r1_ready(gInstance->func[func]->card->host, 1000);
 			if (ret != 0)
-				sd_trace("%s data timeout.\n", __FUNCTION__);
+				AP6210_DEBUG("%s data timeout.\n", __FUNCTION__);
 			
 			if (err_ret)
-				sd_err("%s: %s FAILED %p[%d], addr=0x%05x, pkt_len=%d, ERR=%d\n",
+				AP6210_ERR("%s: %s FAILED %p[%d], addr=0x%05x, pkt_len=%d, ERR=%d\n",
 				       __FUNCTION__,
 				       (write) ? "TX" : "RX",
 				       pnext, SGCount, addr, pkt_len, err_ret);
 			else
-				sd_trace("%s: %s xfr'd %p[%d], addr=0x%05x, len=%d\n",
+				AP6210_DEBUG("%s: %s xfr'd %p[%d], addr=0x%05x, len=%d\n",
 					__FUNCTION__,
 					(write) ? "TX" : "RX",
 					pnext, SGCount, addr, pkt_len);
@@ -1145,7 +1145,7 @@ sdioh_request_packet(sdioh_info_t *sd, uint fix_inc, uint write, uint func,
 		sdio_release_host(gInstance->func[func]);
 	}
 
-	sd_trace("%s: Exit\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Exit\n", __FUNCTION__);
 	return ((err_ret == 0) ? SDIOH_API_RC_SUCCESS : SDIOH_API_RC_FAIL);
 }
 
@@ -1168,13 +1168,13 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 	SDIOH_API_RC Status;
 	void *mypkt = NULL;
 
-	sd_trace("%s: Enter\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
 
 	DHD_PM_RESUME_WAIT(sdioh_request_buffer_wait);
 	DHD_PM_RESUME_RETURN_ERROR(SDIOH_API_RC_FAIL);
 	/* Case 1: we don't have a packet. */
 	if (pkt == NULL) {
-		sd_data("%s: Creating new %s Packet, len=%d\n",
+		AP6210_DEBUG("%s: Creating new %s Packet, len=%d\n",
 		         __FUNCTION__, write ? "TX" : "RX", buflen_u);
 #ifdef CONFIG_DHD_USE_STATIC_BUF
 		if (!(mypkt = PKTGET_STATIC(sd->osh, buflen_u, write ? TRUE : FALSE)))
@@ -1182,7 +1182,7 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 		if (!(mypkt = PKTGET(sd->osh, buflen_u, write ? TRUE : FALSE)))
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 		{
-			sd_err("%s: PKTGET failed: len %d\n",
+			AP6210_ERR("%s: PKTGET failed: len %d\n",
 			           __FUNCTION__, buflen_u);
 			return SDIOH_API_RC_FAIL;
 		}
@@ -1209,7 +1209,7 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 		/* In this case, we cannot have a chain. */
 		ASSERT(PKTNEXT(sd->osh, pkt) == NULL);
 
-		sd_data("%s: Creating aligned %s Packet, len=%d\n",
+		AP6210_DEBUG("%s: Creating aligned %s Packet, len=%d\n",
 		         __FUNCTION__, write ? "TX" : "RX", PKTLEN(sd->osh, pkt));
 #ifdef CONFIG_DHD_USE_STATIC_BUF
 		if (!(mypkt = PKTGET_STATIC(sd->osh, PKTLEN(sd->osh, pkt), write ? TRUE : FALSE)))
@@ -1217,7 +1217,7 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 		if (!(mypkt = PKTGET(sd->osh, PKTLEN(sd->osh, pkt), write ? TRUE : FALSE)))
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 		{
-			sd_err("%s: PKTGET failed: len %d\n",
+			AP6210_ERR("%s: PKTGET failed: len %d\n",
 			           __FUNCTION__, PKTLEN(sd->osh, pkt));
 			return SDIOH_API_RC_FAIL;
 		}
@@ -1243,7 +1243,7 @@ sdioh_request_buffer(sdioh_info_t *sd, uint pio_dma, uint fix_inc, uint write, u
 		PKTFREE(sd->osh, mypkt, write ? TRUE : FALSE);
 #endif /* CONFIG_DHD_USE_STATIC_BUF */
 	} else { /* case 3: We have a packet and it is aligned. */
-		sd_data("%s: Aligned %s Packet, direct DMA\n",
+		AP6210_DEBUG("%s: Aligned %s Packet, direct DMA\n",
 		         __FUNCTION__, write ? "Tx" : "Rx");
 		Status = sdioh_request_packet(sd, fix_inc, write, func, addr, pkt);
 	}
@@ -1258,22 +1258,22 @@ sdioh_abort(sdioh_info_t *sd, uint func)
 #if defined(MMC_SDIO_ABORT)
 	char t_func = (char) func;
 #endif /* defined(MMC_SDIO_ABORT) */
-	sd_trace("%s: Enter\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
 
 #if defined(MMC_SDIO_ABORT)
 	/* issue abort cmd52 command through F1 */
 	sdioh_request_byte(sd, SD_IO_OP_WRITE, SDIO_FUNC_0, SDIOD_CCCR_IOABORT, &t_func);
 #endif /* defined(MMC_SDIO_ABORT) */
 
-	sd_trace("%s: Exit\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Exit\n", __FUNCTION__);
 	return SDIOH_API_RC_SUCCESS;
 }
 
 /* Reset and re-initialize the device */
 int sdioh_sdio_reset(sdioh_info_t *si)
 {
-	sd_trace("%s: Enter\n", __FUNCTION__);
-	sd_trace("%s: Exit\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
+	AP6210_DEBUG("%s: Exit\n", __FUNCTION__);
 	return SDIOH_API_RC_SUCCESS;
 }
 
@@ -1281,7 +1281,7 @@ int sdioh_sdio_reset(sdioh_info_t *si)
 void
 sdioh_sdmmc_devintr_off(sdioh_info_t *sd)
 {
-	sd_trace("%s: %d\n", __FUNCTION__, sd->use_client_ints);
+	AP6210_DEBUG("%s: %d\n", __FUNCTION__, sd->use_client_ints);
 	sd->intmask &= ~CLIENT_INTR;
 }
 
@@ -1289,7 +1289,7 @@ sdioh_sdmmc_devintr_off(sdioh_info_t *sd)
 void
 sdioh_sdmmc_devintr_on(sdioh_info_t *sd)
 {
-	sd_trace("%s: %d\n", __FUNCTION__, sd->use_client_ints);
+	AP6210_DEBUG("%s: %d\n", __FUNCTION__, sd->use_client_ints);
 	sd->intmask |= CLIENT_INTR;
 }
 
@@ -1304,14 +1304,14 @@ sdioh_sdmmc_card_regread(sdioh_info_t *sd, int func, uint32 regaddr, int regsize
 		sdioh_request_byte(sd, SDIOH_READ, func, regaddr, &temp);
 		*data = temp;
 		*data &= 0xff;
-		sd_data("%s: byte read data=0x%02x\n",
+		AP6210_DEBUG("%s: byte read data=0x%02x\n",
 		         __FUNCTION__, *data);
 	} else {
 		sdioh_request_word(sd, 0, SDIOH_READ, func, regaddr, data, regsize);
 		if (regsize == 2)
 			*data &= 0xffff;
 
-		sd_data("%s: word read data=0x%08x\n",
+		AP6210_DEBUG("%s: word read data=0x%08x\n",
 		         __FUNCTION__, *data);
 	}
 
@@ -1324,7 +1324,7 @@ static void IRQHandler(struct sdio_func *func)
 {
 	sdioh_info_t *sd;
 
-	sd_trace("bcmsdh_sdmmc: ***IRQHandler\n");
+	AP6210_DEBUG("bcmsdh_sdmmc: ***IRQHandler\n");
 	sd = gInstance->sd;
 
 	ASSERT(sd != NULL);
@@ -1336,9 +1336,9 @@ static void IRQHandler(struct sdio_func *func)
 		ASSERT(sd->intr_handler_arg);
 		(sd->intr_handler)(sd->intr_handler_arg);
 	} else {
-		sd_err("bcmsdh_sdmmc: ***IRQHandler\n");
+		AP6210_ERR("bcmsdh_sdmmc: ***IRQHandler\n");
 
-		sd_err("%s: Not ready for intr: enabled %d, handler %p\n",
+		AP6210_ERR("%s: Not ready for intr: enabled %d, handler %p\n",
 		        __FUNCTION__, sd->client_intr_enabled, sd->intr_handler);
 	}
 
@@ -1350,7 +1350,7 @@ static void IRQHandlerF2(struct sdio_func *func)
 {
 	sdioh_info_t *sd;
 
-	sd_trace("bcmsdh_sdmmc: ***IRQHandlerF2\n");
+	AP6210_DEBUG("bcmsdh_sdmmc: ***IRQHandlerF2\n");
 
 	sd = gInstance->sd;
 
@@ -1370,7 +1370,7 @@ sdioh_sdmmc_card_regwrite(sdioh_info_t *sd, int func, uint32 regaddr, int regsiz
 
 		temp = data & 0xff;
 		sdioh_request_byte(sd, SDIOH_READ, func, regaddr, &temp);
-		sd_data("%s: byte write data=0x%02x\n",
+		AP6210_DEBUG("%s: byte write data=0x%02x\n",
 		         __FUNCTION__, data);
 	} else {
 		if (regsize == 2)
@@ -1378,7 +1378,7 @@ sdioh_sdmmc_card_regwrite(sdioh_info_t *sd, int func, uint32 regaddr, int regsiz
 
 		sdioh_request_word(sd, 0, SDIOH_READ, func, regaddr, &data, regsize);
 
-		sd_data("%s: word write data=0x%08x\n",
+		AP6210_DEBUG("%s: word write data=0x%08x\n",
 		         __FUNCTION__, data);
 	}
 
@@ -1410,7 +1410,7 @@ sdioh_start(sdioh_info_t *si, int stage)
 		   patch for it
 		*/
 		if ((ret = sdio_reset_comm(gInstance->func[0]->card))) {
-			sd_err("%s Failed, error = %d\n", __FUNCTION__, ret);
+			AP6210_ERR("%s Failed, error = %d\n", __FUNCTION__, ret);
 			return ret;
 		}
 		else {
@@ -1425,7 +1425,7 @@ sdioh_start(sdioh_info_t *si, int stage)
 
 				sd->client_block_size[1] = 64;
 				if (sdio_set_block_size(gInstance->func[1], 64)) {
-					sd_err("bcmsdh_sdmmc: Failed to set F1 blocksize\n");
+					AP6210_ERR("bcmsdh_sdmmc: Failed to set F1 blocksize\n");
 				}
 
 				/* Release host controller F1 */
@@ -1439,7 +1439,7 @@ sdioh_start(sdioh_info_t *si, int stage)
 				sd->client_block_size[2] = sd_f2_blocksize;
 				if (sdio_set_block_size(gInstance->func[2],
 					sd_f2_blocksize)) {
-					sd_err("bcmsdh_sdmmc: Failed to set F2 "
+					AP6210_ERR("bcmsdh_sdmmc: Failed to set F2 "
 						"blocksize to %d\n", sd_f2_blocksize);
 				}
 
@@ -1466,7 +1466,7 @@ sdioh_start(sdioh_info_t *si, int stage)
 		}
 	}
 	else
-		sd_err("%s Failed\n", __FUNCTION__);
+		AP6210_ERR("%s Failed\n", __FUNCTION__);
 
 	return (0);
 }
@@ -1496,7 +1496,7 @@ sdioh_stop(sdioh_info_t *si)
 #endif /* !defined(OOB_INTR_ONLY) */
 	}
 	else
-		sd_err("%s Failed\n", __FUNCTION__);
+		AP6210_ERR("%s Failed\n", __FUNCTION__);
 	return (0);
 }
 

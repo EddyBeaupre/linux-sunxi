@@ -83,7 +83,7 @@ bcmsdh_config_hw_oob_intr(bcmsdh_info_t *sdh, uint chip)
 {
 	uint32 gpiocontrol, addr;
 
- 	AP6210_INFO("%s: Enter\n", __FUNCTION__);
+ 	AP6210_DEBUG("%s: Enter\n", __FUNCTION__);
 	if (CHIPID(chip) == BCM43362_CHIP_ID) {
 		addr = SI_ENUM_BASE + OFFSETOF(chipcregs_t, gpiocontrol);
 		gpiocontrol = bcmsdh_reg_read(sdh, addr, 4);

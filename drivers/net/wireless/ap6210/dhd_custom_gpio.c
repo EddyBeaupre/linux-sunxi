@@ -118,7 +118,7 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 	         __FUNCTION__, dhd_oob_gpio_num);
 
 #if defined CUSTOMER_HW
-	pr_err("%s: should not be here!\n", __FUNCTION__);
+	AP6210_ERR("%s: should not be here!\n", __FUNCTION__);
 #elif defined CUSTOMER_HW3
 	gpio_request(dhd_oob_gpio_num, "oob irq");
 	host_oob_irq = gpio_to_irq(dhd_oob_gpio_num);
