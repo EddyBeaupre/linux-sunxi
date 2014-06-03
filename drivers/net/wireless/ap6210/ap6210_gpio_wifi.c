@@ -11,6 +11,7 @@
 #include <linux/proc_fs.h>
 #include <linux/regulator/consumer.h>
 #include <linux/gpio.h>
+#include <ap6210.h>
 
 static char* wifi_para = "wifi_para";
 
