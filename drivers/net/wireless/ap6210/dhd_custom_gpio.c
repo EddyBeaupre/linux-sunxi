@@ -100,7 +100,7 @@ int dhd_customer_oob_irq_map(unsigned long *irq_flags_ptr)
 
 #elif defined(CUSTOMER_OOB)
 	host_oob_irq = bcm_wlan_get_oob_irq();
-	AP6210_INFO("bcmdhd: irq=%d, flags=0x%08lx\n", host_oob_irq, *irq_flags_ptr);
+	AP6210_DEBUG("irq=%d, flags=0x%08lx\n", host_oob_irq, *irq_flags_ptr);
 #else
 #if defined(CUSTOM_OOB_GPIO_NUM)
 	if (dhd_oob_gpio_num < 0) {

@@ -499,7 +499,7 @@ module_param(dhd_pktgen_len, uint, 0);
 /* Version string to report */
 #ifdef DHD_DEBUG
 #ifndef SRCBASE
-#define SRCBASE        "drivers/net/wireless/bcmdhd"
+#define SRCBASE        "drivers/net/wireless/ap6210"
 #endif
 #define DHD_COMPILED "\nCompiled in " SRCBASE
 #else
@@ -508,7 +508,7 @@ module_param(dhd_pktgen_len, uint, 0);
 
 static char dhd_version[] = "Dongle Host Driver, version " EPI_VERSION_STR
 #ifdef DHD_DEBUG
-"\nCompiled in " SRCBASE " on " __DATE__ " at " __TIME__
+statuc char dhd_version_info[] = "Compiled in " SRCBASE " on " __DATE__ " at " __TIME__
 #endif
 ;
 static void dhd_net_if_lock_local(dhd_info_t *dhd);
@@ -2727,7 +2727,11 @@ dhd_open(struct net_device *net)
 	if (ifidx == 0) {
 		atomic_set(&dhd->pend_8021x_cnt, 0);
 #if defined(WL_CFG80211)
-		DHD_ERROR("\n%s\n", dhd_version);
+		DHD_ERROR("%s\n", dhd_version);
+		#ifdef DHD_DEBUG
+		DHD_ERROR("%s\n", dhd_version_info);
+		#endif
+		
 		if (!dhd_download_fw_on_driverload) {
 			ret = wl_android_wifi_on(net);
 			if (ret != 0) {
@@ -4416,7 +4420,7 @@ dhd_module_init(void)
 	wl_host_wake = WL_HOST_WAKE_DEF_GPIO;
 	gpio_direction_input(wl_host_wake);
 	wl_host_wake_irqno = gpio_to_irq(wl_host_wake);
-	AP6210_INFO("bcmdhd: got gpio%d, mapped to irqno%d\n", wl_host_wake, wl_host_wake_irqno);
+	AP6210_INFO("got gpio%d, mapped to irqno%d\n", wl_host_wake, wl_host_wake_irqno);
 
 	wl_android_init();
 

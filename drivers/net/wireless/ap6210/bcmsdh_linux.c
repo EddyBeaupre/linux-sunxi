@@ -651,7 +651,7 @@ int bcmsdh_register_oob_intr(void * dhdp)
 
 		ret = request_irq(wl_host_wake_irqno, bcmdhd_gpio_irq_handler, IRQF_DISABLED| IRQF_SHARED| IRQF_TRIGGER_HIGH, "bcmdhd_gpio_irq", (void *)&wl_host_wake_irqno);
 		if (ret) {
-                        AP6210_ERR("bcmdhd: request irq%d failed\n", wl_host_wake_irqno);
+                        AP6210_ERR("request irq%d failed\n", wl_host_wake_irqno);
 			return -1;
                 }
 
@@ -702,7 +702,7 @@ void bcmsdh_unregister_oob_intr(void)
 	if (sdhcinfo->oob_irq_registered == TRUE) {
 
 		if(0 != wl_host_wake_irqno) {
-			AP6210_INFO("bcmdhd: free_irq %d\n", wl_host_wake_irqno);
+			AP6210_INFO("free_irq %d\n", wl_host_wake_irqno);
 			free_irq(wl_host_wake_irqno, &wl_host_wake_irqno);
 		}
 
