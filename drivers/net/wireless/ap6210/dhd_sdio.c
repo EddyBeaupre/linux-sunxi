@@ -7134,8 +7134,8 @@ dhdsdio_download_firmware(struct dhd_bus *bus, osl_t *osh, void *sdh)
 	/* Download the firmware */
 	dhdsdio_clkctl(bus, CLK_AVAIL, FALSE);
 
-	AP6210_DEBUG("Final fw_path=%s\n", bus->fw_path);
-	AP6210_DEBUG("Final nv_path=%s\n", bus->nv_path);
+	AP6210_ERR("Final fw_path=%s\n", bus->fw_path);
+	AP6210_ERR("Final nv_path=%s\n", bus->nv_path);
 	ret = _dhdsdio_download_firmware(bus) == 0;
 
 	dhdsdio_clkctl(bus, CLK_SDONLY, FALSE);

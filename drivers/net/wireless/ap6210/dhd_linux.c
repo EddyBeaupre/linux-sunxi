@@ -4493,7 +4493,7 @@ dhd_module_init(void)
 	error = dhd_bus_register();
 
 	if (!error)
-		AP6210_DEBUG("Dongle Host Driver, version %s\n", dhd_version);
+		AP6210_DEBUG("%s\n", dhd_version);
 	else {
 		AP6210_ERR("%s: sdio_register_driver failed\n", __FUNCTION__);
 		goto fail_1;
