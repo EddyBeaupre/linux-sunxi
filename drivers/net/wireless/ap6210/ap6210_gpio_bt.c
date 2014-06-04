@@ -20,6 +20,8 @@ static __inline int ap6210_gpio_wifi_gpio_ctrl(char* name, int level)
 }
 #endif
 
+#include <ap6210.h>
+
 static const char bt_name[] = "bcm40183";
 static struct rfkill *sw_rfkill;
 static int bt_used;
