@@ -139,7 +139,7 @@ int gmac_mdio_register(struct net_device *ndev)
 	new_bus->parent = priv->device;
 	err = mdiobus_register(new_bus);
 	if (err != 0) {
-		GMAC_ERR( "%s: Cannot register as MDIO bus\n", new_bus->name);
+		printk(KERN_ERR "%s: Cannot register as MDIO bus\n", new_bus->name);
 		goto bus_register_fail;
 	}
 
@@ -186,7 +186,7 @@ int gmac_mdio_register(struct net_device *ndev)
 				irq_str = irq_num;
 				break;
 			}
-			GMAC_ERR("%s: PHY ID %08x at %d IRQ %s (%s)%s\n",
+			pr_info("%s: PHY ID %08x at %d IRQ %s (%s)%s\n",
 				ndev->name, phydev->phy_id, addr,
 				irq_str, dev_name(&phydev->dev),
 				act ? " active" : "");
@@ -195,7 +195,7 @@ int gmac_mdio_register(struct net_device *ndev)
 	}
 
 	if (!found){
-		GMAC_ERR( "%s: No PHY found\n", ndev->name);
+		printk(KERN_WARNING "%s: No PHY found\n", ndev->name);
 		err = -ENXIO;
 		goto out_err;
 	}

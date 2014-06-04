@@ -109,12 +109,12 @@ static int gmac_ethtool_getsettings(struct net_device *ndev,
 	struct phy_device *phy = ndev->phydev;
 	int rc;
 	if (phy == NULL) {
-		GMAC_ERR("%s: %s: PHY is not registered\n",
+		pr_err("%s: %s: PHY is not registered\n",
 		       __func__, ndev->name);
 		return -ENODEV;
 	}
 	if (!netif_running(ndev)) {
-		GMAC_ERR("%s: interface is disabled: we cannot track "
+		pr_err("%s: interface is disabled: we cannot track "
 		"link speed / duplex setting\n", ndev->name);
 		return -EBUSY;
 	}
