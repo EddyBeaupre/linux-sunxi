@@ -49,7 +49,12 @@ int desc_get_tx_status(void *data, struct gmac_extra_stats *x,
 	}
 
 	if (p->desc0.tx.vlan_tag) {
-		GMAC_INFO("GMAC TX status: VLAN frame\n");
+	        /* If you're really using VLAN on your network,
+	         * keeping this to INFO is terribly spammy, for
+	         * for an idle box, rsyslog take 22% of the CPU
+	         * just to log this at INFO level...
+	         */
+		GMAC_DEBUG("GMAC TX status: VLAN frame\n");
 		x->tx_vlan++;
 	}
 
