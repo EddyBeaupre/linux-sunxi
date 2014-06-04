@@ -2511,7 +2511,7 @@ dhd_wlfc_init(dhd_pub_t *dhd)
 		Leaving the message for now, it should be removed after a while; once
 		the tlv situation is stable.
 		*/
-		AP6210_ERR("dhd_wlfc_init(): successfully %s bdcv2 tlv signaling, %d\n",
+		AP6210_DEBUG("dhd_wlfc_init(): successfully %s bdcv2 tlv signaling, %d\n",
 			dhd->wlfc_enabled?"enabled":"disabled", tlv);
 	}
 	return BCME_OK;

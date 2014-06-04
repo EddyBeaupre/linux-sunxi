@@ -646,7 +646,7 @@ int bcmsdh_register_oob_intr(void * dhdp)
 	dev_set_drvdata(sdhcinfo->dev, dhdp);
 
 	if (!sdhcinfo->oob_irq_registered) {
-		AP6210_ERR("%s IRQ=%d Type=%X \n", __FUNCTION__,
+		AP6210_DEBUG("%s IRQ=%d Type=%X \n", __FUNCTION__,
 			(int)sdhcinfo->oob_irq, (int)sdhcinfo->oob_flags);
 
 		ret = request_irq(wl_host_wake_irqno, bcmdhd_gpio_irq_handler, IRQF_DISABLED| IRQF_SHARED| IRQF_TRIGGER_HIGH, "bcmdhd_gpio_irq", (void *)&wl_host_wake_irqno);

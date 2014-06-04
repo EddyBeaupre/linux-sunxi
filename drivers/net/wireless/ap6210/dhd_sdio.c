@@ -7406,7 +7406,7 @@ dhdsdio_download_code_file(struct dhd_bus *bus, char *pfw_path)
 	uint8 *memblock = NULL, *memptr;
 	uint8 *memptr_tmp = NULL; // terence: check downloaded firmware is correct
 
-	AP6210_ERR("%s: download firmware %s\n", __FUNCTION__, pfw_path);
+	AP6210_ERR("download firmware %s\n", pfw_path);
 
 	image = dhd_os_open_image(pfw_path);
 	if (image == NULL)
@@ -7806,9 +7806,9 @@ dhd_bus_devreset(dhd_pub_t *dhdp, uint8 flag)
 #endif /* DHDTHREAD */
 		} else {
 			bcmerror = BCME_SDIO_ERROR;
-			AP6210_ERR("%s called when dongle is not in reset\n",
+			AP6210_DEBUG("%s called when dongle is not in reset\n",
 				__FUNCTION__);
-			AP6210_ERR("Will call dhd_bus_start instead\n");
+			AP6210_DEBUG("Will call dhd_bus_start instead\n");
 			sdioh_start(NULL, 1);
 #if defined(HW_OOB)
 			bcmsdh_config_hw_oob_intr(bus->sdh, bus->sih->chip); // terence 20120615: fix for OOB initial issue
