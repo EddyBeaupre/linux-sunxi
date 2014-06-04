@@ -4130,7 +4130,7 @@ dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
 		AP6210_ERR("couldn't register the net device, err %d\n", err);
 		goto fail;
 	}
-	AP6210_INFO("Broadcom Dongle Host Driver: register interface [%s] MAC: "MACDBG"\n",
+	AP6210_ERR("Broadcom Dongle Host Driver: register interface [%s] MAC: "MACDBG"\n",
 		net->name,
 		MAC2STRDBG(net->dev_addr));
 
@@ -4493,7 +4493,7 @@ dhd_module_init(void)
 	error = dhd_bus_register();
 
 	if (!error)
-		AP6210_INFO("%s\n", dhd_version);
+		AP6210_ERR("Dongle Host Driver, version %s\n", dhd_version);
 	else {
 		AP6210_ERR("%s: sdio_register_driver failed\n", __FUNCTION__);
 		goto fail_1;
@@ -5348,7 +5348,7 @@ write_to_file(dhd_pub_t *dhd, uint8 *buf, int size)
 	/* open file to write */
 	fp = filp_open("/tmp/mem_dump", O_WRONLY|O_CREAT, 0640);
 	if (!fp) {
-		AP6210_INFO("%s: open file error\n", __FUNCTION__);
+		AP6210_ERR("%s: open file error\n", __FUNCTION__);
 		ret = -1;
 		goto exit;
 	}
@@ -5591,8 +5591,8 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 	int i;
 
 	i = snprintf(info_string, sizeof(info_string), "Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
-	AP6210_INFO("%s\n", EPI_VERSION_STR);
-        AP6210_INFO("%s\n", fw);
+	AP6210_ERR("Driver: %s\n", EPI_VERSION_STR);
+        AP6210_ERR("Firmware: %s\n", fw);
 
 	if (!dhdp)
 		return;
@@ -5600,7 +5600,7 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 	i = snprintf(&info_string[i], sizeof(info_string) - i,
 		"\n  Chip: %x Rev %x Pkg %x", dhd_bus_chip_id(dhdp),
 		dhd_bus_chiprev_id(dhdp), dhd_bus_chippkg_id(dhdp));
-        AP6210_INFO("Chip: %x Rev %x Pkg %x", dhd_bus_chip_id(dhdp), dhd_bus_chiprev_id(dhdp), dhd_bus_chippkg_id(dhdp));
+        AP6210_ERR("Chip: %x Rev %x Pkg %x", dhd_bus_chip_id(dhdp), dhd_bus_chiprev_id(dhdp), dhd_bus_chippkg_id(dhdp));
 }
 
 int dhd_ioctl_entry_local(struct net_device *net, wl_ioctl_t *ioc, int cmd)
@@ -5997,7 +5997,7 @@ static void dhd_dump_latency(void)
 	int i, max = 0;
 	int d1, d2, d3, d4, d5;
 
-	AP6210_INFO("T1       T2       T3       T4           d1  d2   t4-t1     i    \n");
+	AP6210_DEBUG("T1       T2       T3       T4           d1  d2   t4-t1     i    \n");
 	for (i = 0; i < TSMAX; i++) {
 		d1 = ts[i].t2 - ts[i].t1;
 		d2 = ts[i].t3 - ts[i].t2;
@@ -6007,15 +6007,15 @@ static void dhd_dump_latency(void)
 		if (d4 > d5 && d4 > 0)  {
 			max = i;
 		}
-		AP6210_INFO("%08X %08X %08X %08X \t%d %d %d   %d i=%d\n",
+		AP6210_DUMP("%08X %08X %08X %08X \t%d %d %d   %d i=%d\n",
 			ts[i].t1, ts[i].t2, ts[i].t3, ts[i].t4,
 			d1, d2, d3, d4, i);
 	}
 
-	AP6210_INFO("current idx = %d \n", tsidx);
+	AP6210_DEBUG("current idx = %d \n", tsidx);
 
-	AP6210_INFO("Highest latency %d pkt no.%d total=%d\n", maxdelay, maxdelaypktno, tspktcnt);
-	AP6210_INFO("%08X %08X %08X %08X \t%d %d %d   %d\n",
+	AP6210_DEBUG("Highest latency %d pkt no.%d total=%d\n", maxdelay, maxdelaypktno, tspktcnt);
+	AP6210_DEBUG("%08X %08X %08X %08X \t%d %d %d   %d\n",
 	maxdelayts.t1, maxdelayts.t2, maxdelayts.t3, maxdelayts.t4,
 	maxdelayts.t2 - maxdelayts.t1,
 	maxdelayts.t3 - maxdelayts.t2,
@@ -6090,7 +6090,7 @@ void htsf_update(dhd_info_t *dhd, void *data)
 	}
 
 	if (data == NULL)
-		AP6210_INFO(" tsf update ata point er is null \n");
+		AP6210_DEBUG(" tsf update ata point er is null \n");
 
 	memcpy(&prev_tsf, &cur_tsf, sizeof(tsf_t));
 	memcpy(&cur_tsf, data, sizeof(tsf_t));

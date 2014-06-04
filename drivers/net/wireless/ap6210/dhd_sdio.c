@@ -2813,7 +2813,7 @@ dhdsdio_readconsole(dhd_bus_t *bus)
 			if (line[n - 1] == '\r')
 				n--;
 			line[n] = 0;
-			AP6210_INFO("CONSOLE: %s\n", line);
+			AP6210_DEBUG("CONSOLE: %s\n", line);
 		}
 	}
 break2:
@@ -2975,7 +2975,7 @@ dhdsdio_checkdied(dhd_bus_t *bus, char *data, uint size)
 					 */
 
 					if (dhd_msg_level & DHD_ERROR_VAL)
-						AP6210_INFO("CONSOLE: %s\n", line);
+						AP6210_DEBUG("CONSOLE: %s\n", line);
 				}
 			}
 		}
@@ -6015,7 +6015,7 @@ dhdsdio_pktgen(dhd_bus_t *bus)
 	/* Display current count if appropriate */
 	if (bus->pktgen_print && (++bus->pktgen_ptick >= bus->pktgen_print)) {
 		bus->pktgen_ptick = 0;
-		AP6210_INFO("%s: send attempts %d, rcvd %d, errors %d\n",
+		AP6210_DEBUG("%s: send attempts %d, rcvd %d, errors %d\n",
 		       __FUNCTION__, bus->pktgen_sent, bus->pktgen_rcvd, bus->pktgen_fail);
 
 		/* Print throughput stats only for constant length packet runs */
@@ -6027,7 +6027,7 @@ dhdsdio_pktgen(dhd_bus_t *bus)
 			rcvd_pkts = bus->pktgen_rcvd - bus->pktgen_prev_rcvd;
 			bus->pktgen_prev_rcvd = bus->pktgen_rcvd;
 
-			AP6210_INFO("%s: Tx Throughput %d kbps, Rx Throughput %d kbps\n",
+			AP6210_DEBUG("%s: Tx Throughput %d kbps, Rx Throughput %d kbps\n",
 			  __FUNCTION__,
 			  (sent_pkts * bus->pktgen_len / jiffies_to_msecs(time_lapse)) * 8,
 			  (rcvd_pkts * bus->pktgen_len  / jiffies_to_msecs(time_lapse)) * 8);
@@ -6549,10 +6549,10 @@ dhdsdio_probe(uint16 venid, uint16 devid, uint16 bus_no, uint16 slot,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 
 	if (mutex_is_locked(&_dhd_sdio_mutex_lock_) == 0) {
-		AP6210_ERR("%s : no mutex held. set lock\n", __FUNCTION__);
+		AP6210_DEBUG("%s : no mutex held. set lock\n", __FUNCTION__);
 	}
 	else {
-		AP6210_ERR("%s : mutex is locked!. wait for unlocking\n", __FUNCTION__);
+		AP6210_DEBUG("%s : mutex is locked!. wait for unlocking\n", __FUNCTION__);
 	}
 	mutex_lock(&_dhd_sdio_mutex_lock_);
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)) */
@@ -7053,7 +7053,7 @@ dhd_bus_select_firmware_name_by_chip(struct dhd_bus *bus, char *dst, char *src)
 		if (src[0] == '\0')
 #endif
 		{
-			AP6210_INFO("src firmware path is null\n");
+			AP6210_DEBUG("src firmware path is null\n");
 			return;
 		}
 	}
@@ -7107,7 +7107,7 @@ dhd_bus_select_firmware_name_by_chip(struct dhd_bus *bus, char *dst, char *src)
 			break;
 	}
 
-	AP6210_INFO("%s: firmware_path=%s\n", __FUNCTION__, dst);
+	AP6210_DEBUG("%s: firmware_path=%s\n", __FUNCTION__, dst);
 }
 
 bool
@@ -7134,8 +7134,8 @@ dhdsdio_download_firmware(struct dhd_bus *bus, osl_t *osh, void *sdh)
 	/* Download the firmware */
 	dhdsdio_clkctl(bus, CLK_AVAIL, FALSE);
 
-	AP6210_INFO("Final fw_path=%s\n", bus->fw_path);
-	AP6210_INFO("Final nv_path=%s\n", bus->nv_path);
+	AP6210_DEBUG("Final fw_path=%s\n", bus->fw_path);
+	AP6210_DEBUG("Final nv_path=%s\n", bus->nv_path);
 	ret = _dhdsdio_download_firmware(bus) == 0;
 
 	dhdsdio_clkctl(bus, CLK_SDONLY, FALSE);
@@ -7254,10 +7254,10 @@ dhdsdio_disconnect(void *ptr)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25))
 
 	if (mutex_is_locked(&_dhd_sdio_mutex_lock_) == 0) {
-		AP6210_ERR("%s : no mutex held. set lock\n", __FUNCTION__);
+		AP6210_DEBUG("%s : no mutex held. set lock\n", __FUNCTION__);
 	}
 	else {
-		AP6210_ERR("%s : mutex is locked!. wait for unlocking\n", __FUNCTION__);
+		AP6210_DEBUG("%s : mutex is locked!. wait for unlocking\n", __FUNCTION__);
 	}
 	mutex_lock(&_dhd_sdio_mutex_lock_);
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 25)) */

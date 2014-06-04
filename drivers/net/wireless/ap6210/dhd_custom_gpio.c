@@ -138,7 +138,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 
 	switch (onoff) {
 		case WLAN_RESET_OFF:
-			AP6210_INFO("%s: call customer specific GPIO to insert WLAN RESET\n",
+			AP6210_DEBUG("%s: call customer specific GPIO to insert WLAN RESET\n",
 				__FUNCTION__);
 #ifdef CUSTOMER_HW
 			ap6210_gpio_wifi_power(0);
@@ -151,7 +151,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 		break;
 
 		case WLAN_RESET_ON:
-			AP6210_INFO("%s: callc customer specific GPIO to remove WLAN RESET\n",
+			AP6210_DEBUG("%s: callc customer specific GPIO to remove WLAN RESET\n",
 				__FUNCTION__);
 #ifdef CUSTOMER_HW
 			ap6210_gpio_wifi_power(1);
@@ -164,7 +164,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 		break;
 
 		case WLAN_POWER_OFF:
-			AP6210_INFO("%s: call customer specific GPIO to turn off WL_REG_ON\n",
+			AP6210_DEBUG("%s: call customer specific GPIO to turn off WL_REG_ON\n",
 				__FUNCTION__);
 #ifdef CUSTOMER_HW
 			ap6210_gpio_wifi_power(0);
@@ -174,7 +174,7 @@ dhd_customer_gpio_wlan_ctrl(int onoff)
 		break;
 
 		case WLAN_POWER_ON:
-			AP6210_INFO("%s: call customer specific GPIO to turn on WL_REG_ON\n",
+			AP6210_DEBUG("%s: call customer specific GPIO to turn on WL_REG_ON\n",
 				__FUNCTION__);
 #ifdef CUSTOMER_HW
 			ap6210_gpio_wifi_power(1);
@@ -194,7 +194,7 @@ dhd_custom_get_mac_address(unsigned char *buf)
 {
 	int ret = 0;
 
-	AP6210_INFO("%s Enter\n", __FUNCTION__);
+	AP6210_DEBUG("%s Enter\n", __FUNCTION__);
 	if (!buf)
 		return -EINVAL;
 
