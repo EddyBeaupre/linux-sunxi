@@ -4493,7 +4493,7 @@ dhd_module_init(void)
 	error = dhd_bus_register();
 
 	if (!error)
-		AP6210_ERR("Dongle Host Driver, version %s\n", dhd_version);
+		AP6210_DEBUG("Dongle Host Driver, version %s\n", dhd_version);
 	else {
 		AP6210_ERR("%s: sdio_register_driver failed\n", __FUNCTION__);
 		goto fail_1;
@@ -5591,8 +5591,6 @@ void dhd_set_version_info(dhd_pub_t *dhdp, char *fw)
 	int i;
 
 	i = snprintf(info_string, sizeof(info_string), "Driver: %s\n  Firmware: %s ", EPI_VERSION_STR, fw);
-	AP6210_ERR("Driver: %s\n", EPI_VERSION_STR);
-        AP6210_ERR("Firmware: %s\n", fw);
 
 	if (!dhdp)
 		return;
