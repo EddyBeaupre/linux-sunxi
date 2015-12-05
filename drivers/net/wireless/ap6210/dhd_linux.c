@@ -43,6 +43,7 @@
 #include <linux/fcntl.h>
 #include <linux/fs.h>
 #include <linux/gpio.h>
+#include <linux/errno.h>
 
 #include <asm/uaccess.h>
 #include <asm/unaligned.h>
@@ -4418,7 +4419,7 @@ dhd_module_init(void)
 	ap6210_gpio_wifi_init();
 	sw_rfkill_init();
 
-	if (gpio_request(WL_HOST_WAKE_DEF_GPIO, "wl_host_wake")) {
+	if ( gpio_request(WL_HOST_WAKE_DEF_GPIO, "wl_host_wake") < 0) {
 		AP6210_ERR("[%s] get wl_host_wake gpio failed\n", __FUNCTION__);
 		wl_host_wake = -1;
 		return -1;
