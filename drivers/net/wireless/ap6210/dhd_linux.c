@@ -4419,11 +4419,13 @@ dhd_module_init(void)
 	ap6210_gpio_wifi_init();
 	sw_rfkill_init();
 
+	/*
 	if ( gpio_request(WL_HOST_WAKE_DEF_GPIO, "wl_host_wake") < 0) {
 		AP6210_ERR("[%s] get wl_host_wake gpio failed\n", __FUNCTION__);
 		wl_host_wake = -1;
 		return -1;
 	}
+	*/
 	wl_host_wake = WL_HOST_WAKE_DEF_GPIO;
 	gpio_direction_input(wl_host_wake);
 	wl_host_wake_irqno = gpio_to_irq(wl_host_wake);
